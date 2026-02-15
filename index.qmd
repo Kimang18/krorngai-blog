@@ -1,12 +1,33 @@
 ---
-title: "KrorngAI"
+image: logo_black_v2.png
+listing: default
+about:
+  template: jolla
+  image-shape: round
+  image-width: 15em
+  links:
+    - text: YT Videos
+      icon: youtube
+      href: https://kimang18.github.io/youtube/
+    - text: HF Spaces
+      icon: rocket
+      href: https://kimang18.github.io/huggingface/
+    - text: Teaching & Talks
+      icon: school
+      href: https://kimang18.github.io/teaching/
+    - text: Research
+      icon: pen
+      href: https://kimang18.github.io/research/
+    - text: About Me
+      icon: user
+      href: https://kimang18.github.io/
+    - text: Google Scholar
+      icon: google
+      href: https://scholar.google.com/citations?user=ee_NM0wAAAAJ&hl=enhttps://kimang18.github.io/
+    - text: Github
+      icon: github
+      href: https://github.com/Kimang18
+    - text: Mail
+      icon: envelope
+      href: mailto:kimang.khun@polytechnique.org
 ---
-
-
-This is a Quarto website.
-
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
-
-```{python}
-1 + 1
-```

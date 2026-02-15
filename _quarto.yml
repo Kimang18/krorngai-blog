@@ -4,14 +4,11 @@ project:
 
 website:
   title: "KrorngAI"
-  navbar:
-    left:
-      - href: index.qmd
-        text: Home
-      - about.qmd
 
 format:
   html:
+    linkcolor: "black"
+    mainfont: "JetBrainsMono Nerd Font"
     theme: cosmo
     css: styles.css
     toc: true
