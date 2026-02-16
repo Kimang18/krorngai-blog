@@ -8,7 +8,8 @@ website:
 format:
   html:
     linkcolor: "black"
-    mainfont: "JetBrainsMono Nerd Font"
+    mainfont: "Gill Sans"
+    fontsize: 22px
     theme: cosmo
     css: styles.css
     toc: true
