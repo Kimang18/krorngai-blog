@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="KrorngAI">
+<meta name="dcterms.date" content="2023-07-22">
+<meta name="description" content="ក្នុងអត្ថបទនេះ ខ្ញុំនិងបរិយាយព័ត៌មានទាក់ទងនឹង MAB ដោយចាប់ផ្តើមពីការពន្យល់ពីនិយមន័យ និងប្រវត្តិសង្ខេបនៃ MAB ក្នុងផ្នែកទី១។ ផ្នែកទី២បកស្រាយអំពីទ្វេគ្រោះនៃការរុករកនិងការចំរាញ់ (Exploration-Exploitation Dilemma)។ ផ្នែកទី៣នឹងក្តោបលើរង្វាស់រង្វាល់គុណភាពនៃប្រមាណវិធី (Algorithm) ដែលដោះស្រាយបញ្ហា MAB ។ ខ្ញុំនឹងសង្ខេបអត្ថបទឡើងវិញក្នុងផ្នែកទី៤">
+
+<title>សេចក្តីផ្តើមនៃ Multi-Armed Bandit – KrorngAI</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-39d349927537621b566d286ac43747d6.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#multi-armed-bandit-ជអវ" id="toc-multi-armed-bandit-ជអវ" class="nav-link active" data-scroll-target="#multi-armed-bandit-ជអវ">Multi-armed bandit ជាអ្វី?</a></li>
+  <li><a href="#បរមណវធ-algorithm" id="toc-បរមណវធ-algorithm" class="nav-link" data-scroll-target="#បរមណវធ-algorithm">ប្រមាណវិធី (Algorithm)</a></li>
+  <li><a href="#រងវសគណភពនបរមណវធ" id="toc-រងវសគណភពនបរមណវធ" class="nav-link" data-scroll-target="#រងវសគណភពនបរមណវធ">រង្វាស់គុណភាពនៃប្រមាណវិធី</a></li>
+  <li><a href="#សននដឋន" id="toc-សននដឋន" class="nav-link" data-scroll-target="#សននដឋន">សន្និដ្ឋាន</a></li>
+  <li><a href="#ឯកសរយង" id="toc-ឯកសរយង" class="nav-link" data-scroll-target="#ឯកសរយង">ឯកសារយោង</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">សេចក្តីផ្តើមនៃ Multi-Armed Bandit</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Science</div>
+    <div class="quarto-category">Technology</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    ក្នុងអត្ថបទនេះ ខ្ញុំនិងបរិយាយព័ត៌មានទាក់ទងនឹង MAB ដោយចាប់ផ្តើមពីការពន្យល់ពីនិយមន័យ និងប្រវត្តិសង្ខេបនៃ MAB ក្នុងផ្នែកទី១។ ផ្នែកទី២បកស្រាយអំពីទ្វេគ្រោះនៃការរុករកនិងការចំរាញ់ (Exploration-Exploitation Dilemma)។ ផ្នែកទី៣នឹងក្តោបលើរង្វាស់រង្វាល់គុណភាពនៃប្រមាណវិធី (Algorithm) ដែលដោះស្រាយបញ្ហា MAB ។ ខ្ញុំនឹងសង្ខេបអត្ថបទឡើងវិញក្នុងផ្នែកទី៤
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>KrorngAI </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">July 22, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Multi-armed bandit (MAB) គឺជាបញ្ហាគណិតវិទ្យាមួយដែលត្រូវបានសិក្សាយ៉ាងស៊ីជម្រៅ និងប្រើប្រាស់យ៉ាងទូលំទូលាយ។ MAB ត្រូវបានផ្តួចផ្តើមដំបូងក្នុងសហគមន៍អ្នកស្រាវជ្រាវតាំងពីឆ្នាំ១៩៣៣មកម៉្លេះ <span class="citation" data-cites="thompson1933likelihood">(<a href="#ref-thompson1933likelihood" role="doc-biblioref">Thompson 1933</a>)</span> ហើយនៅតែបន្តត្រូវបានគេសិក្សារហូតមកដល់សព្វថ្ងៃ <span class="citation" data-cites="simchi2023multi">(<a href="#ref-simchi2023multi" role="doc-biblioref">Simchi-Levi and Wang 2023</a>)</span>។ MAB គឺជាគម្រូលេខនៃបញ្ហារស់នៅក្នុងជីវិតយ៉ាងច្រើនដូចជា ការសាកឃ្លីនិក (Clinical Trial <span class="citation" data-cites="thompson1933likelihood">(<a href="#ref-thompson1933likelihood" role="doc-biblioref">Thompson 1933</a>)</span>) ប្រព័ន្ធផ្តល់យោបល់ (Recommendation system <span class="citation" data-cites="lattimore2020bandit">(<a href="#ref-lattimore2020bandit" role="doc-biblioref">Lattimore and Szepesvári 2020</a>)</span>) និងការដាក់ផ្សព្វផ្សាយពាណិជ្ជកម្ម (Advert Placement <span class="citation" data-cites="lattimore2020bandit">(<a href="#ref-lattimore2020bandit" role="doc-biblioref">Lattimore and Szepesvári 2020</a>)</span>) ជាដើម។ នេះបញ្ជាក់ថា MAB គឺជាបញ្ហាមួយដ៏សំខាន់ដែលយើងទាំងអស់គ្នាគួរតែយកចិត្តទុកដាក់ស្វែងយល់។</p>
+<p>ក្នុងអត្ថបទនេះ ខ្ញុំនិងបរិយាយព័ត៌មានទាក់ទងនឹង MAB ដោយចាប់ផ្តើមពីការពន្យល់ពីនិយមន័យ និងប្រវត្តិសង្ខេបនៃ MAB ក្នុងផ្នែកទី១។ ផ្នែកទី២បកស្រាយអំពីទ្វេគ្រោះនៃការរុករកនិងការចំរាញ់ (Exploration-Exploitation Dilemma)។ ផ្នែកទី៣នឹងក្តោបលើរង្វាស់រង្វាល់គុណភាពនៃប្រមាណវិធី (Algorithm) ដែលដោះស្រាយបញ្ហា MAB ។ ខ្ញុំនឹងសង្ខេបអត្ថបទឡើងវិញក្នុងផ្នែកទី៤។</p>
+<section id="multi-armed-bandit-ជអវ" class="level1">
+<h1>Multi-armed bandit ជាអ្វី?</h1>
+<p>សូមពិចារណាបញ្ហាដូចតទៅនេះ។ ស្រមៃថាអ្នកត្រូវការសម្រេចចិត្តម្តងហើយម្តងទៀត ដោយជ្រើសរើស <span class="math inline">\(1\)</span> ក្នុងជម្រើស <span class="math inline">\(k\)</span>។ ក្រោយការសម្រេចចិត្តម្តងៗ អ្នកអាចទទួលបានរង្វាន់ដែលមានលក្ខណៈចៃដន្យ ហើយភាពចៃដន្យនេះអាស្រ័យលើជម្រើសរបស់អ្នក។ អ្នកមានគោលបំណងបង្កើនមធ្យមនៃរង្វាន់សរុបទទួលបានអោយដល់អតិបរមា ដោយកំហិតថាចំនួនសម្រេចចិត្តមានកំណត់ ឧទាហរណ៍អ្នកអាចសម្រេចចិត្តបានតែមួយពាន់ដង ឬមួយពាន់ជំហានជាដើម។</p>
+<p>នេះជាទម្រង់ដើមនៃបញ្ហា <span class="math inline">\(k\)</span>-armed bandit ដែលឈ្មោះនេះយកតាមម៉ាស៊ីនល្បែងក្នុងកាស៊ីណូដូចក្នុងរូបទី១ (<a href="#fig-slotMachine" class="quarto-xref">Figure&nbsp;1</a>) ប៉ុន្តែប្តូរពីជួរមាន <span class="math inline">\(k\)</span> ម៉ាស៊ីនដៃ <span class="math inline">\(1\)</span> មកជាម៉ាស៊ីនមួយមានដៃ <span class="math inline">\(k\)</span> វិញ។ ការសម្រេចចិត្តម្តងៗគឺដូចជាការដាក់កាក់ទាញដៃណាមួយនៃម៉ាស៊ីននេះ ហើយការផ្តល់រង្វាន់ប្រៀបដូចជាម៉ាស៊ីននេះទម្លាក់លុយ (hit the jackpot) អុីចឹង។ តាមរយៈការលេងម្តងហើយម្តងទៀត អ្នកនឹងចំណាយកាក់ទាញតែដៃណាមួយគត់ដែលតែងតែទម្លាក់លុយច្រើននិងញឹកញាប់ជាងគេ។</p>
+<div id="fig-slotMachine" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-slotMachine-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://kimang18.github.io/assets/fig/intro_mab_640px-Las_Vegas_slot_machines.jpg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-slotMachine-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: រូបទី១៖ ជួរម៉ាស៊ីនដាក់កាក់ទម្លាក់លុយនៅរដ្ឋឡាសវេហ្គាស សហរដ្ឋអាមេរិច (<a href="https://en.wikipedia.org/wiki/Multi-armed_bandit">តំណ</a>)
+</figcaption>
+</figure>
+</div>
+<p>ដើម្បីសម្រួលដល់ការស្វែងយល់ ខ្ញុំនឹងប្រើប្រាស់ម៉ូដែលគណិតវិទ្យាសម្រាប់ <span class="math inline">\(k\)</span>-armed bandit ដូចតទៅ។ សន្មត់ថាម៉ាស៊ីនអាចទម្លាក់រង្វាន់ <span class="math inline">\(1\)</span> ឯកតា ឬ <span class="math inline">\(0\)</span> ឯកតា ដែលឱកាសទម្លាក់រង្វាន់ <span class="math inline">\(1\)</span> ប្រែប្រួលតាមដៃនិមួយៗ និងសន្មត់ថាយើងអាចលេងបានតែ <span class="math inline">\(T\in\mathbb{N}\setminus\\{0\\}\)</span> ជំហានប៉ុណ្ណោះ ។ យើងតាង <span class="math inline">\(\mu_i\)</span> ជាឱកាស ឬតម្លៃសង្ឃឹម (ត្រង់នេះ ឱកាស និងតម្លៃសង្ឃឹមស្មើគ្នាក៏ព្រោះតែអថេរចៃដន្យមានរបាយ Bernoulli ហើយគេប្រើប្រាស់ តម្លៃសង្ឃឹម ក្នុងការអនុវត្តផ្លូវការ ប៉ុន្តែខ្ញុំប្រើប្រាស់ ឱកាស ដើម្បីជួយសម្រួលដល់ការពន្យល់របស់ខ្ញុំប៉ុណ្ណោះ) ដែលដៃ <span class="math inline">\(i\)</span> ធ្វើអោយម៉ាស៊ីនទម្លាក់រង្វាន់ <span class="math inline">\(1\)</span> ហើយតាង <span class="math inline">\(r_t\in\\{0,1\\}\)</span> ជារង្វាន់ដែលទទួលបាននៅជំហាន <span class="math inline">\(t\)</span> ដែល <span class="math inline">\(1\le t\le T\)</span>។ រង្វាន់សរុបបន្ទាប់ពីលេងបាន <span class="math inline">\(T\)</span> ជំហានគឺ <span class="math inline">\(\sum_{t=1}^T r_t\)</span>។ <span style="color:red">ដោយសន្មត់ថាពេលចាប់ផ្តើមលេង យើងមិនស្គាល់អំពីតម្លៃ <span class="math inline">\(\\{\mu_i\\}_{1\le i\le k}\)</span>ឡើយ យើងមានគោលបំណងប្រមូលជាអតិបរមា មធ្យមនៃរង្វាន់សរុបទទួលបានបន្ទាប់ពីលេងបាន <span class="math inline">\(T\)</span> ជំហាន </span></p>
+<p><span class="math display">\[\begin{equation}
+\mathbb{E}\left[ \sum_{t=1}^T r_t\right]
+\end{equation}\]</span></p>
+<p>។ នេះជាម៉ូដែលគណិតវិទ្យាងាយមួយសម្រាប់បញ្ហា <span class="math inline">\(k\)</span>-armed bandit។</p>
+<p>ដោយសារម៉ូដែលគណិតវិទ្យាសម្រាប់បញ្ហា <span class="math inline">\(k\)</span>-armed bandit មានលក្ខណៈសាមញ្ញ បញ្ហានេះត្រូវបានគេសិក្សា និងអនុវត្តយ៉ាងទូលំទូលាយ។ ការអនុវត្តក្លាសិកមួយគឺការសាកឃ្លីនិក (Clinical Trial <span class="citation" data-cites="thompson1933likelihood">(<a href="#ref-thompson1933likelihood" role="doc-biblioref">Thompson 1933</a>)</span>) ដែលគ្រូពេទ្យត្រូវសម្រេចចិត្តអោយថ្នាំ <span class="math inline">\(1\)</span> ប្រភេទក្នុងចំណោមថ្នាំ <span class="math inline">\(k\)</span> ប្រភេទទៅអ្នកជម្ងឺដើម្បីអោយគាត់បានជាសះស្បើយ។ ដោយប្រើថ្នាំប្រភេទ <span class="math inline">\(i\)</span> អ្នកជម្ងឺមានឱកាសជាសះស្បើយ <span class="math inline">\(100\times\mu_i\)</span> ភាគរយ។ គ្រូពេទ្យមានគោលបំណងអោយចំនួនអ្នកជម្ងឺជាសះស្បើយមានច្រើនអតិបរមា ប៉ុន្តែលោកចាប់ផ្តើមព្យាបាលដោយមិនស្គាល់តម្លៃឱកាស <span class="math inline">\(\mu_i\)</span> ណាមួយឡើយ។ ការអនុវត្តមួយទៀតក្នុងសម័យឌីជីថល គឺការដាក់ផ្សព្វផ្សាយពាណិជ្ជកម្ម (Advert Placement <span class="citation" data-cites="lattimore2020bandit">(<a href="#ref-lattimore2020bandit" role="doc-biblioref">Lattimore and Szepesvári 2020</a>)</span>) ដែលម្ចាស់វេបសាយចង់លក់ផលិតផលមួយ ដោយដាក់វីដេអូ <span class="math inline">\(1\)</span> ក្នុងចំណោមវីដេអូផ្សាយពាណិជ្ជកម្ម <span class="math inline">\(k\)</span> អោយអ្នកប្រើប្រាស់ (User) មើល។ ក្រោយមើលវីដេអូ <span class="math inline">\(i\)</span> អ្នកប្រើប្រាស់ចុចទិញដោយឱកាស <span class="math inline">\(100\times\mu_i\)</span> ភាគរយ។ ចាប់ផ្តើមដោយមិនស្គាល់ពីតម្លៃនៃ <span class="math inline">\(\mu_i\)</span> ណាមួយឡើយ ម្ចាស់វេបសាយមានគោលបំណងបង្កើនការលក់អោយបានអតិបរមា។ ទាំងនេះបញ្ជាក់ថា បញ្ហា <span class="math inline">\(k\)</span>-armed bandit មានការអនុវត្តយ៉ាងច្រើន។</p>
+</section>
+<section id="បរមណវធ-algorithm" class="level1">
+<h1>ប្រមាណវិធី (Algorithm)</h1>
+<p>ដោយមិនស្គាល់ពីតម្លៃសង្ឃឹម <span class="math inline">\(\\{\mu_i \\}_{1\le i\le k}\)</span> យើងប្រឈមនឹងវិវាទការណ៍រវាងយុទ្ធសាស្រ្ត២គឺ ការរុករក (Exploration) និងការចំរាញ់ (Exploitation)។ <span style="color:red">ការរុករក</span>អនុញ្ញាតអោយយើង<span style="color:red">ប្រមូលព័ត៌មាន</span>ដើម្បីប៉ាន់ប្រមាណតម្លៃសង្ឃឹមនៃដៃនិមួយៗអោយបានជាក់លាក់ ប៉ុន្តែបណ្តាលអោយយើងខាតជំហានព្រោះតែចំនួនជំហានសរុបមានកំណត់។ ចំណែកឯ<span style="color:red">ការចំរាញ់</span>អនុញ្ញាតអោយយើង<span style="color:red">ប្រើប្រាស់ព័ត៌មានប្រមូលបាន</span>ដើម្បីប្រមាណថាដៃមួយណាមានតម្លៃសង្ឃឹមខ្ពស់ជាងគេ ប៉ុន្តែបណ្តាលអោយយើងសម្រេចចិត្តខុសនៅពេលដែលព័ត៌មានប្រមូលបានមិនទាន់គ្រប់គ្រាន់។ ជាឧទាហរណ៍ គ្រូពេទ្យអាចសាកថ្នាំនិមួយៗច្រើនដងដើម្បីដឹងពីប្រសិទ្ធភាពរបស់វា ប៉ុន្តែអាចបណ្តាលអោយមានចំនួនអ្នកជម្ងឺជាសះស្បើយតិច ដែលធ្វើអោយគ្រូពេទ្យនោះបាត់បង់កេរ្តិឈ្មោះ។ ម៉្យាងទៀត គ្រូពេទ្យអាចប្រើប្រាស់បទពិសោធន៍របស់គាត់ដើម្បីសម្រេចថាថ្នាំមួយប្រភេទណាមានប្រសិទ្ធភាពខ្ពស់ជាងគេ ប៉ុន្តែបើបទពិសោធន៍មិនគ្រប់គ្រាន់ នោះការសម្រេចចិត្តគាត់នឹងមិនត្រឹមត្រូវដែលបណ្តាលអោយមានចំនួនអ្នកជម្ងឺជាសះស្បើយតិចដូចគ្នា។ ជាទូទៅ វិវាទការណ៍នេះត្រូវបានគេអោយឈ្មោះថា <font color="red">ទ្វេគ្រោះនៃការរុករកនិងការចំរាញ់ (Exploration-Exploitation Dilemma)</font>។</p>
+<p>ជាធម្មតា ប្រមាណវិធីដែលយើងនឹកឃើញមុនគេសម្រាប់ដោះស្រាយបញ្ហា <span class="math inline">\(k\)</span>-armed bandit គឺការសាកទាញដៃនិមួយៗដោយចំនួនថេរដងណាមួយ (រុករក) រួចគណនាតែម្តងគត់ថាដៃណាដែលមានមធ្យមសំណាក (sample average) ធំជាងគេ ហើយទាញតែដៃមួយនោះរហូតដោយមិនធ្វើការគណនាអ្វីទៀតឡើយ (ប្តូរផ្តាច់)។ គេអោយឈ្មោះប្រមាណវិធីនេះថា រុករករួចប្តូរផ្តាច់ (Explore-then-Commit, ETC)។ តែដោយទទួលដឹងអំពីទ្វេគ្រោះនៃការរុករកនិងការចំរាញ់ យើងអាចកែច្នៃប្រមាណវិធីខាងដើមដោយក្នុងប្រូបាប៊ីលីតេ <span class="math inline">\(\varepsilon\)</span> ទាញដៃមួយដោយចៃដន្យដោយប្រូបាប៊ីលីតេឯកសណ្ឋាន និងក្នុងប្រូបាប៊ីលីតេ <span class="math inline">\(1-\varepsilon\)</span> ទាញដៃដែលមានមធ្យមសំណាកធំជាងគេ។ ប្រមាណវិធីនេះមានឈ្មោះថា <span class="math inline">\(\varepsilon\)</span>-Greedy ដែលឆ្លើយតបនឹងទ្វេគ្រោះនៃការរុករកនិងការចំរាញ់ដោយរក្សាឱកាស <span class="math inline">\(100\times\varepsilon\)</span> ភាគរយក្នុងការរុករកដើម្បីបន្តប្រមូលពត៌មាន ប៉ុន្តែមិនចំណាយជំហានច្រើនពេកក្នុងការរុករកឡើយ។ ប្រមាណវិធីទាំង២នេះជាឧទាហរណ៍នៃការដោះស្រាយបញ្ហា <span class="math inline">\(k\)</span>-armed bandit។</p>
+<p>ដើម្បីប្រៀបធៀបគុណភាពនៃប្រមាណទាំង២ខាងលើ ខ្ញុំបានអនុវត្តពិសោធន៍លេខតូចមួយលើបញ្ហា <span class="math inline">\(2\)</span>-armed bandit ដែលមានការកំណត់ដូចតទៅ។ ខ្ញុំជ្រើសយកគូ <span class="math inline">\((\mu_1=0.1, \mu_2=0.5)\)</span>ជាការកំណត់នៃបញ្ហា (problem configuration) ហើយចំពោះ ETC ខ្ញុំជ្រើសទាញដៃនិមួយៗ ៤ដងមុននឹងប្តូរផ្តាច់។ ចំណែក <span class="math inline">\(\varepsilon\)</span>-Greedy ខ្ញុំជ្រើសយក <span class="math inline">\(\varepsilon=0.1\)</span>។ ជាលទ្ធផលពិសោធន៍លេខ រូបទី២(<a href="#fig-avg_rew" class="quarto-xref">Figure&nbsp;2</a>)បង្ហាញពីរង្វាន់មធ្យមក្នុងមួយជំហាន ដែលប្រមាណវិធីនិមួយៗទទួលបាន។ លទ្ធផលនេះបង្ហាញថា <span class="math inline">\(\varepsilon\)</span>-Greedy ល្អជាង ETC ហើយ <span class="math inline">\(\varepsilon\)</span>-Greedy មានរង្វាន់មធ្យមក្នុងមួយជំហានខិតទៅក្បែរ (ប៉ុន្តែ តិចជាង) <span class="math inline">\(\mu_2=0.5\)</span> ដែលជាអតិបរមានៃរង្វាន់មធ្យមក្នុងមួយជំហាន។</p>
+<div id="fig-avg_rew" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-avg_rew-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./assets/intro_mab_avg_rew.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-avg_rew-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: រូបទី២៖ រង្វាន់មធ្យមក្នុងមួយជំហាន ដែលប្រមាណវិធីនិមួយៗទទួលបានក្នុងបញ្ហា <span class="math inline">\(2\)</span>-armed bandit ដែល <span class="math inline">\(\mu_1=0.1\)</span> និង <span class="math inline">\(\mu_2=0.5\)</span>។ អ័ក្សឈរបង្ហាញពីរង្វាន់មធ្យមក្នុងមួយជំហាននៃប្រមាណវិធីនិមួយៗ ឯអ័ក្សដេកបង្ហាញពីចំនួនជំហានដែលបានលេងហើយ។
+</figcaption>
+</figure>
+</div>
+<!-- &emsp; &emsp; បើទោះជារង្វាន់មធ្យមក្នុងមួយជំហានអាចបង្ហាញថាប្រមាណវិធីមួយល្អជាងមួយទៀតក៏ដោយ (ដូចក្នុង[រូបទី២](#avg_rew) ប្រមាណវិធី $\varepsilon$-Greedy ល្អជាង ETC) ក៏វាមិនទាន់គ្រប់គ្រាន់សម្រាប់បញ្ជាក់ពីគុណភាពនៃប្រមាណវិធីមួយដែរ។ តួយ៉ាង តើរង្វាន់មធ្យមក្នុងមួយជំហានរបស់ $\varepsilon$-Greedy នឹងខិតទៅស្មើ $\mu_2$ ដែរឬទេ ប្រសិនបើយើងបន្តជំហានទៅមុខទៀត? បើតាមការគណនាគឺអត់ទេ (អ្នកអាចសាកល្បងគណនាបាន)។ នេះសបញ្ជាក់ថា $\varepsilon$-Greedy មិនផ្តល់មធ្យមនៃរង្វាន់សរុបអតិបរមាឡើយ។ ម៉្យាងវិញទៀត ក្នុងបញ្ហាជីវិតជាក់ស្តែង យើងមិនមានឱកាសស្គាល់តម្លៃនៃ$\mu_2$ឡើយ។ ត្រង់នេះមានន័យថា សំនួរខាងដើម “តើរង្វាន់មធ្យមក្នុងមួយជំហានរបស់ $\varepsilon$-Greedy នឹងខិតទៅស្មើ $\mu_2$ ដែរឬទេ ប្រសិនបើយើងបន្តជំហានទៅមុខទៀត?” មិនមានចម្លើយឡើយក្នុងបញ្ហាជីវិតជាក់ស្តែង។ ដូចនេះ ដើម្បីវិនិច្ឆ័យគុណភាពនៃប្រមាណវិធីមួយ គេត្រូវការទំហំមួយផ្សេងពីរង្វាន់មធ្យមក្នុងមួយជំហាន។ -->
+</section>
+<section id="រងវសគណភពនបរមណវធ" class="level1">
+<h1>រង្វាស់គុណភាពនៃប្រមាណវិធី</h1>
+<p>ដើម្បីវាស់គុណភាពនៃប្រមាណវិធីណាមួយ អ្នកវិទ្យាសាស្រ្តអាចប្រើប្រាស់ទំហំមួយអោយឈ្មោះថា <font color="red"><span class="math inline">\(\text{Regret}\)</span></font> ។ បើយើងស្គាល់តម្លៃសង្ឃឹម <span class="math inline">\(\\{\mu_i \\}_{1\le i\le k}\)</span> នោះយើងអាចទទួលបានមធ្យមនៃរង្វាន់សរុបអតិបរមា ដោយគ្រាន់តែទាញដៃណាដែលមានសង្ឃឹមធំជាងគេ ហើយតម្លៃអតិបរមានោះស្មើ <span class="math inline">\(\max_i\mu_i T\)</span> ដែល <span class="math inline">\(\max_i\mu_i\)</span> ជាតម្លៃសង្ឃឹមធំជាងគេ។ អ្នកវិទ្យាសាស្រ្តកំណត់ <span class="math inline">\(\text{Regret}\)</span> នៃប្រមាណវិធី <span class="math inline">\(\mathcal{A}\)</span> ដោយ <!-- យើងតាង $\mu^*⁡:= \max_i\mu_i$ ជាតម្លៃសង្ឃឹមធំជាងគេ។ --></p>
+<p><span class="math display">\[\begin{equation}
+\text{Regret}(\mathcal{A}, T):=\max_i\mu_i T -\sum_{t=1}^T r_t
+\end{equation}\]</span></p>
+<p>។ តាមនិយមន័យនេះ <span class="math inline">\(\text{Regret}\)</span> របស់<span class="math inline">\(\varepsilon\)</span>-Greedy ក្នុងពិសោធន៍ខាងលើគឺជាក្រឡាផ្ទៃខណ្ឌដោយបន្ទាត់ពណ៌ផ្កាឈូកនិងខ្សែកោងពណ៌ខ្មៅនៅក្នុងរូបទី២(<a href="#fig-avg_rew" class="quarto-xref">Figure&nbsp;2</a>)។ ខ្ញុំបង្ហាញក្រឡាផ្ទៃនេះក្នុងរូបទី៣(<a href="#fig-epsilon_avg_regret" class="quarto-xref">Figure&nbsp;3</a>) ខាងក្រោម។</p>
+<div id="fig-epsilon_avg_regret" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-epsilon_avg_regret-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./assets/intro_mab_avg_rew_regret.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-epsilon_avg_regret-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: រូបទី៣៖ <span class="math inline">\(\text{Regret}\)</span> មធ្យមនៃ<span class="math inline">\(\varepsilon\)</span>-Greedy បង្ហាញដោយផ្ទៃក្រឡាផាត់ពណ៌ខ្មៅ។ អ័ក្សឈរបង្ហាញពីរង្វាន់មធ្យមក្នុងមួយជំហាននៃប្រមាណវិធីនិមួយៗ ឯអ័ក្សដេកបង្ហាញពីចំនួនជំហានដែលបានលេងហើយ។
+</figcaption>
+</figure>
+</div>
+<p>ទន្ទឹមនឹងនិយមន័យខាងលើនេះ រូបទី៤(<a href="#fig-avg_regret" class="quarto-xref">Figure&nbsp;4</a>) បង្ហាញពី <span class="math inline">\(\text{Regret}\)</span> មធ្យមនៃប្រមាណវិធី <span class="math inline">\(\varepsilon\)</span>-Greedy និងETC ជាអនុគមន៍នៃជំហាន ក្នុងពិសោធន៍លេខដែលបានរៀបរាប់ខាងលើ។ តាមរយៈរូបទី៤(<a href="#fig-avg_regret" class="quarto-xref">Figure&nbsp;4</a>) <span class="math inline">\(\text{Regret}\)</span> នៃ<span class="math inline">\(\varepsilon\)</span>-Greedy និងETC ជាអនុគមន៍លីនេអ៊ែរនៃជំហាន ពេលដែលចំនួនជំហានកាន់តែធំ ដែលគេនិយមសរសេរថា <span class="math inline">\(\text{Regret}\)</span> ស្មើទៅនឹង <span class="math inline">\(O(T)\)</span>។</p>
+<div id="fig-avg_regret" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-avg_regret-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./assets/intro_mab_avg_regret.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-avg_regret-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: រូបទី៤៖ <span class="math inline">\(\text{Regret}\)</span> មធ្យមនៃប្រមាណវិធីនិមួយៗទទួលបានក្នុងបញ្ហា <span class="math inline">\(2\)</span>-armed bandit ដែល <span class="math inline">\(\mu_1=0.1\)</span> និង <span class="math inline">\(\mu_2=0.5\)</span>។ អ័ក្សឈរបង្ហាញពី <span class="math inline">\(\text{Regret}\)</span> មធ្យមក្នុងមួយជំហាននៃប្រមាណវិធីនិមួយៗ ឯអ័ក្សដេកបង្ហាញពីចំនួនជំហានដែលបានលេងហើយ។
+</figcaption>
+</figure>
+</div>
+<p>បើ <span class="math inline">\(\text{Regret}\)</span> មធ្យមកាន់តែតូច នោះប្រមាណវិធីកាន់តែមានគុណភាពល្អ។ ទាញចេញពីរូបទី៣(<a href="#fig-epsilon_avg_regret" class="quarto-xref">Figure&nbsp;3</a>) ខាងលើ <span class="math inline">\(\text{Regret}\)</span> មធ្យមកាន់តែតូច ប្រសិនបើរង្វាន់មធ្យមក្នុងមួយជំហានរបស់ប្រមាណវិធី កាន់តែឆាប់ខិតទៅជិតអតិបរមាននៃរង្វាន់មធ្យមក្នុងមួយជំហាន ដែលគេនិយមនិយាយថា ប្រមាណវិធីរៀនកាន់តែលឿន។ ជាទ្រឹស្តី គេចាត់ទុកថាប្រមាណវិធី <span class="math inline">\(\mathcal{A}\)</span> មួយល្អប្រសើរ បើ <span class="math inline">\(\displaystyle\lim_{T\to+\infty} \frac{\text{Regret}(\mathcal{A}, T)}{T}=0\)</span> (ឬគេអាចសរសេរ <span class="math inline">\(\text{Regret}(\mathcal{A}, T)= o(T)\)</span>)។ ប្រសិនបើករណីនេះពិត គេនិយាយថា <span class="math inline">\(\mathcal{A}\)</span> ជាប្រមាណវិធី no-regret។ ដូចនេះ <span class="math inline">\(\varepsilon\)</span>-Greedy និង ETC មិនមែនជាប្រមាណវិធី no-regret ឡើយ។ ក្នុងបញ្ហា multi-armed bandit អ្នកវិទ្យាសាស្រ្តចង់តាក់តែងប្រមាណវិធីណាដែលមាន <span class="math inline">\(\text{Regret}\)</span> មធ្យមស្មើទៅនឹង <span class="math inline">\(O(T^\alpha)\)</span> ដោយព្យាយាមធ្វើអោយ <span class="math inline">\(\alpha\)</span> តូចតាមដែលអាចធ្វើទៅបាន។</p>
+<p>ដោយសារទ្វេគ្រោះនៃការរុករកនិងការចំរាញ់ ប្រមាណវិធីល្អ<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>កម្រិតណាក៏ដោយ ក៏ត្រូវតែមានការខាតបង់ដែរ។ អ្នកស្រាវជ្រាវបានសិក្សាស្វែងរកកំហាតបង់អប្បបរមាដែលប្រមាណវិធីល្អមួយមិនអាចជៀសបាន។ ក្នុងនោះ <span class="citation" data-cites="lai1985asymptotically">(<a href="#ref-lai1985asymptotically" role="doc-biblioref">Lai and Robbins 1985</a>)</span> បានចងក្រងជាទ្រឹស្តីថា មានទំហំ <span class="math inline">\(c(\theta)\ln(T)\)</span> ជាកំហាតបង់អប្បបរមា និងត្រូវបានគេអោយឈ្មោះថា <font color="red">ដែនទាល់ក្រោម (Lower bound)</font>។ រូបទី៥(<a href="#fig-avg_regret_lower" class="quarto-xref">Figure&nbsp;5</a>) បង្ហាញពីដែនទាល់ក្រោមក្នុងពិសោធន៍ខាងលើ។ តាមរយៈរូបទី៥(<a href="#fig-avg_regret_lower" class="quarto-xref">Figure&nbsp;5</a>) ឥរិយាបថអាស៊ីមតូទីក (asymtotic behavior) របស់<span class="math inline">\(\varepsilon\)</span>-Greedy និង ETC (ដែលមានរាងជាអនុគមន៍បន្ទាត់) មិនដូចនឹងដែនទាល់ក្រោមឡើយ (ដែលមានរាងជាអនុគមន៍លោការីត)។</p>
+<div class="theorem">
+<p>យក <span class="math inline">\(\Theta\)</span> ជាសំណុំមួយនៃការកំណត់បញ្ហា (set of problem configurations)។ បើប្រមាណវិធី <span class="math inline">\(\mathcal{A}\)</span> មួយមានលក្ខណៈល្អជាឯកសណ្ឋាន (uniformly efficient) លើសំណុំ <span class="math inline">\(\Theta\)</span> នោះរាល់ការកំណត់បញ្ហា <span class="math inline">\(\theta\in\Theta\)</span> <span class="math display">\[
+  \text{Regret}(\mathcal{A}, T) \ge c(\theta)\ln(T)  
+\]</span> ដែល <span class="math inline">\(c(\theta)\)</span> ជាចំនួនថេរមួយអាស្រ័យនឹង <span class="math inline">\(\theta\)</span>។</p>
+</div>
+<p>តាមរយៈទ្រឹស្តីនេះ គ្មានអ្នកវិទ្យាសាស្រ្តណាអាចតាក់តែងប្រមាណវិធីល្អមួយដែលមាន <span class="math inline">\(\text{Regret}\)</span> ស្មើនឹង <span class="math inline">\(o(\ln T)\)</span> ក្នុងរាល់ការកំណត់បញ្ហាឡើយ។ ដូចនេះ ប្រមាណវិធីណាដែលមាន <span class="math inline">\(\text{Regret}\)</span> ស្មើនឹង <span class="math inline">\(O(\ln T)\)</span> ក្នុងរាល់ការកំណត់បញ្ហា នឹងត្រូវបានគេហៅថា <font color="red">ប្រមាណវិធីដែលអាស៊ីមតូទិកខលលីអុបធីម៉ល (asymptotically optimal)</font>។</p>
+<p>*សម្គាល់: ប្រមាណវិធី <span class="math inline">\(\mathcal{A}\)</span> ល្អជាឯកសណ្ឋាន (uniformly efficient) លើសំណុំ <span class="math inline">\(\Theta\)</span> មានន័យថា រាល់ការកំណត់បញ្ហា <span class="math inline">\({\theta\in\Theta}\)</span>, <span class="math inline">\(\text{Regret}(\mathcal{A},T)=O(T^{\alpha})\)</span> ដែល <span class="math inline">\(\alpha\in(0,1)\)</span> ឬនិយាយម៉្យាងទៀតថា <span class="math inline">\(\mathcal{A}\)</span> ជាប្រមាណវិធី no-regret ក្នុងរាល់ការកំណត់បញ្ហា <span class="math inline">\({\theta\in\Theta}\)</span> ។</p>
+<div id="fig-avg_regret_lower" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-avg_regret_lower-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./assets/intro_mab_avg_regret_with_lowerbound.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-avg_regret_lower-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: រូបទី៥៖ <span class="math inline">\(\text{Regret}\)</span> មធ្យមនៃប្រមាណវិធីនិមួយៗទទួលបានក្នុងបញ្ហា <span class="math inline">\(2\)</span>-armed bandit ដែល <span class="math inline">\(\mu_1=0.1\)</span> និង <span class="math inline">\(\mu_2=0.5\)</span>។ ខ្សែកោងពណ៌ទឹកក្រូចដាច់ៗបង្ហាញពីដែនទាល់ក្រោមនៃការកំណត់បញ្ហានេះ។
+</figcaption>
+</figure>
+</div>
+<!--
+ប្រមាណវិធីមួយអាចផ្តល់លទ្ធផលខុសគ្នាលើការកំណត់នៃបញ្ហា (problem configuration) ផ្សេងគ្នា។ តួយ៉ាង ខ្ញុំបានអនុវត្តពិសោធន៍តូចមួយលើបញ្ហា $2$-armed bandit ដែលមានការកំណត់២ផ្សេងគ្នា។ ការកំណត់ទី១ ខ្ញុំជ្រើសយកគូ $(\mu^1=0.1, \mu^2=0.5)$ ឯការកំណត់ទី២ ខ្ញុំជ្រើសយកគូ $(\mu^1=0.1, \mu^2=0.2)$។ ក្នុងពិសោធន៍នេះ ខ្ញុំបានប្រើប្រាស់ប្រមាណវិធី២ គឺ រុករករួចប្តូរផ្តាច់ (ETC) និង $\varepsilon$-Greedy។ ចំពោះ ETC ខ្ញុំជ្រើសទាញដៃនិមួយៗ ២ដងមុននឹងប្តូរផ្តាច់។ ចំណែក $\varepsilon$-Greedy ខ្ញុំជ្រើសយក $\varepsilon=0.1$។  រូបទី [...] បង្ហាញពីលទ្ធផលពិសោធន៍លេខ
+-->
+</section>
+<section id="សននដឋន" class="level1">
+<h1>សន្និដ្ឋាន</h1>
+<p>នៅក្នុងអត្ថបទនេះ ខ្ញុំបានរៀបរាប់អំពី Multi-armed bandit ដែលជាបញ្ហាបង្កប់នូវទ្វេគ្រោះនៃការរុករកនិងការចំរាញ់។ ដើម្បីវាស់វែងការដោះដូរ (tradeoff) រវាងការរុករក និងការចំរាញ់ ឬគុណភាពរបស់ប្រមាណវិធីណាមួយ គេអាចប្រើប្រាស់ទំហំអោយឈ្មោះថា <span class="math inline">\(\text{Regret}\)</span>។ កម្រិតល្អជាអប្បបរមានៃរាល់ប្រមាណវិធីត្រូវបានកំណត់ដោយដែនទាល់ក្រោមនៃ <span class="math inline">\(\text{Regret}\)</span>។ ក្នុងអត្ថបទក្រោយ ខ្ញុំនឹងនិយាយអំពីវិធីសាស្រ្តមួយដែលសាកល្បងដោះស្រាយទ្វេគ្រោះនៃការរុករកនិងការចំរាញ់៕</p>
+</section>
+<section id="ឯកសរយង" class="level1">
+
+
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">ឯកសារយោង</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-lai1985asymptotically" class="csl-entry" role="listitem">
+Lai, Tze Leung, and Herbert Robbins. 1985. <span>“Asymptotically Efficient Adaptive Allocation Rules.”</span> <em>Advances in Applied Mathematics</em> 6 (1): 4–22.
+</div>
+<div id="ref-lattimore2020bandit" class="csl-entry" role="listitem">
+Lattimore, Tor, and Csaba Szepesvári. 2020. <em>Bandit Algorithms</em>. Cambridge University Press.
+</div>
+<div id="ref-simchi2023multi" class="csl-entry" role="listitem">
+Simchi-Levi, David, and Chonghuan Wang. 2023. <span>“Multi-Armed Bandit Experimental Design: Online Decision-Making and Adaptive Inference.”</span> In <em>International Conference on Artificial Intelligence and Statistics</em>, 3086–97. PMLR.
+</div>
+<div id="ref-thompson1933likelihood" class="csl-entry" role="listitem">
+Thompson, William R. 1933. <span>“On the Likelihood That One Unknown Probability Exceeds Another in View of the Evidence of Two Samples.”</span> <em>Biometrika</em> 25 (3/4): 285–94.
+</div>
+</div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>ពាក្យ “ល្អ” ត្រង់នេះចង់សំដៅថាល្អជាឯកសណ្ឋាន ដែលមិនថាការកំណត់របស់បញ្ហាបែបណាទេ(for any problem configurations) ក៏ប្រមាណវិធីនោះមាន Regret ស្មើនឹង <span class="math inline">\(O(T^\alpha)\)</span> ដោយ<span class="math inline">\(\alpha&lt;1\)</span> (សូមមើលសម្គាល់ខាងលើ)។<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
