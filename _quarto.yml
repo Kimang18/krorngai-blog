@@ -7,7 +7,7 @@ website:
 
 format:
   html:
-    linkcolor: "black"
+    linkcolor: "blue"
     mainfont: "Gill Sans"
     fontsize: 22px
     theme: cosmo
