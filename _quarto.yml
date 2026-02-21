@@ -3,14 +3,18 @@ project:
   output-dir: docs
 
 website:
-  title: "KrorngAI"
+  title: "ក្រង AI"
+  navbar:
+    left:
+      - text: "Home"
+        href: index.qmd
 
 format:
   html:
     linkcolor: "blue"
     mainfont: "Gill Sans"
     fontsize: 22px
-    theme: cosmo
+    theme: flatly
     css: styles.css
     toc: true
 

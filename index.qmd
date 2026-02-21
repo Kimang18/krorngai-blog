@@ -1,6 +1,7 @@
 ---
 image: logo_black_v2.png
-listing: default
+listing:
+  sort: "data desc"
 about:
   template: jolla
   image-shape: round
