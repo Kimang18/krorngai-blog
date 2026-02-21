@@ -179,6 +179,7 @@ window.Quarto = {
   <li><a href="#compared-to-parseq" id="toc-compared-to-parseq" class="nav-link" data-scroll-target="#compared-to-parseq">Compared to PARSeq</a></li>
   <li><a href="#compared-to-dtrocr" id="toc-compared-to-dtrocr" class="nav-link" data-scroll-target="#compared-to-dtrocr">Compared to DTrOCR</a></li>
   </ul></li>
+  <li><a href="#fine-tune-tutorial" id="toc-fine-tune-tutorial" class="nav-link" data-scroll-target="#fine-tune-tutorial">Fine-tune Tutorial</a></li>
   <li><a href="#result" id="toc-result" class="nav-link" data-scroll-target="#result">Result</a></li>
   <li><a href="#deployment" id="toc-deployment" class="nav-link" data-scroll-target="#deployment">Deployment</a></li>
   <li><a href="#implementation" id="toc-implementation" class="nav-link" data-scroll-target="#implementation">Implementation</a></li>
@@ -337,6 +338,12 @@ Table&nbsp;1: Configuration of Transformer Blocks of TrorYongOCR
 <h3 class="anchored" data-anchor-id="compared-to-dtrocr">Compared to DTrOCR</h3>
 <p>For DTrOCR which is a decoder-only architecture, the image embedding (patch embedding plus position embedding) is concatenated with input character embedding (a [SEP] token is added at the beginning of input character embedding to indicate sequence separation. [SEP] token is equivalent to <code>bos</code> token in TrorYongOCR), and causal self-attention mechanism is applied to the concatenation from layer to layer to generate text autoregressively (see Figure 2 of <span class="citation" data-cites="fujitake2024dtrocr">(<a href="#ref-fujitake2024dtrocr" role="doc-biblioref">Fujitake 2024</a>)</span>).</p>
 </section>
+</section>
+<section id="fine-tune-tutorial" class="level2">
+<h2 class="anchored" data-anchor-id="fine-tune-tutorial">Fine-tune Tutorial</h2>
+<p>You can find my video tutorial on fine-tuning TrorYongOCR in the video below.</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/3W8P0mByFBY?si=TbGdt_hlDtEb_LNs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="">
+</iframe>
 </section>
 <section id="result" class="level2">
 <h2 class="anchored" data-anchor-id="result">Result</h2>
