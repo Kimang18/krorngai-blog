@@ -3,9 +3,9 @@ image: logo_black_v2.png
 listing:
   sort: "data desc"
 about:
-  template: jolla
+  template: solana
   image-shape: round
-  image-width: 15em
+  image-width: 9em
   links:
     - text: YT Videos
       icon: youtube
@@ -33,7 +33,7 @@ about:
       href: mailto:kimang.khun@polytechnique.org
 ---
 
-# Support My Work
+## Support My Work
 
 While this work comes truly from the heart, each video represents a significant investment of time -- from deep-dive research and code preparation to the final narrative and editing process.
 I am incredibly passionate about sharing this knowledge, but maintaining this level of quality is a major undertaking.
@@ -46,4 +46,10 @@ Your generosity acts as a huge encouragement and helps ensure that I can continu
   <figcaption> Using Cambodian bank account, you can donate by scanning my ABA QR code here. (or click <a href="https://pay.ababank.com/oRF8/8yp6hy53">here</a>. Make sure that receiver's name is 'Khun Kim Ang'.) </figcaption>
 </figure>
 
-# Recent Posts
+## PyPI Packages
+
+- TrorYongOCR: Optical Character Recognition Models with my design of model architecture (`pip install tror-yong-ocr` or more info [here](https://pypi.org/project/tror-yong-ocr/)) 
+- NeoWhisper: Re-implementation of Whisper with the most recent attention technologies (`pip install neo-whisper` or more info [here](https://pypi.org/project/neo-whisper/))
+- TrorYongGPT: Small Language Models with the most recent attention technologies implemented (`pip install tror-yong-lm` or more info [here](https://pypi.org/project/tror-yong-lm/))
+
+## Recent Posts

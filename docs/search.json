@@ -58,9 +58,9 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "Support My Work",
+    "title": "ក្រង AI",
     "section": "",
-    "text": "Support My Work\nWhile this work comes truly from the heart, each video represents a significant investment of time – from deep-dive research and code preparation to the final narrative and editing process. I am incredibly passionate about sharing this knowledge, but maintaining this level of quality is a major undertaking. If you find these videos helpful and are in a position to do so, please consider supporting my work with a donation. You can click here to donate or scan the QR code below. Your generosity acts as a huge encouragement and helps ensure that I can continue creating in-depth, valuable content for you.\n\n\n\n\n\nUsing Cambodian bank account, you can donate by scanning my ABA QR code here. (or click here. Make sure that receiver’s name is ‘Khun Kim Ang’.)\n\n\n\n\nRecent Posts\n\n\n\n\n\n\n\n\n\n\n\nTrorYong OCR: Meet Your Tiny OCR Model\n\n\nDesign a Tiny OCR Model for Khmer text\n\n\n\n\n\nFeb 19, 2026\n\n\nKrorngAI\n\n\n\n\n\n\n\n\n\n\nសេចក្តីផ្តើមនៃ Multi-Armed Bandit\n\n\nក្នុងអត្ថបទនេះ ខ្ញុំនិងបរិយាយព័ត៌មានទាក់ទងនឹង MAB ដោយចាប់ផ្តើមពីការពន្យល់ពីនិយមន័យ និងប្រវត្តិសង្ខេបនៃ MAB ក្នុងផ្នែកទី១។ ផ្នែកទី២បកស្រាយអំពីទ្វេគ្រោះនៃការរុករកនិងការចំរាញ់ (Exploration-Exploitation Dilemma)។ ផ្នែកទី៣នឹងក្តោបលើរង្វាស់រង្វាល់គុណភាពនៃប្រមាណវិធី (Algorithm) ដែលដោះស្រាយបញ្ហា MAB ។ ខ្ញុំនឹងសង្ខេបអត្ថបទឡើងវិញក្នុងផ្នែកទី៤\n\n\n\n\n\nJul 22, 2023\n\n\nKrorngAI\n\n\n\n\n\n\n\n\n\n\nScence Text Recognition with Permuted Autoregressive Sequence Models\n\n\nRe-implementing PARSeq Model from scratch for Khmer text\n\n\n\n\n\nFeb 1, 2026\n\n\nKrorngAI\n\n\n\n\n\nNo matching items"
+    "text": "While this work comes truly from the heart, each video represents a significant investment of time – from deep-dive research and code preparation to the final narrative and editing process. I am incredibly passionate about sharing this knowledge, but maintaining this level of quality is a major undertaking. If you find these videos helpful and are in a position to do so, please consider supporting my work with a donation. You can click here to donate or scan the QR code below. Your generosity acts as a huge encouragement and helps ensure that I can continue creating in-depth, valuable content for you.\n\n\n\n\n\nUsing Cambodian bank account, you can donate by scanning my ABA QR code here. (or click here. Make sure that receiver’s name is ‘Khun Kim Ang’.)"
   },
   {
     "objectID": "IntroMultiarmed/index.html",
@@ -180,5 +180,26 @@
     "title": "TrorYong OCR: Meet Your Tiny OCR Model",
     "section": "",
     "text": "You can find my video tutorial on fine-tuning TrorYongOCR in the video below."
+  },
+  {
+    "objectID": "index.html#support-my-work",
+    "href": "index.html#support-my-work",
+    "title": "ក្រង AI",
+    "section": "",
+    "text": "While this work comes truly from the heart, each video represents a significant investment of time – from deep-dive research and code preparation to the final narrative and editing process. I am incredibly passionate about sharing this knowledge, but maintaining this level of quality is a major undertaking. If you find these videos helpful and are in a position to do so, please consider supporting my work with a donation. You can click here to donate or scan the QR code below. Your generosity acts as a huge encouragement and helps ensure that I can continue creating in-depth, valuable content for you.\n\n\n\n\n\nUsing Cambodian bank account, you can donate by scanning my ABA QR code here. (or click here. Make sure that receiver’s name is ‘Khun Kim Ang’.)"
+  },
+  {
+    "objectID": "index.html#recent-posts",
+    "href": "index.html#recent-posts",
+    "title": "ក្រង AI",
+    "section": "Recent Posts",
+    "text": "Recent Posts"
+  },
+  {
+    "objectID": "index.html#pypi-packages",
+    "href": "index.html#pypi-packages",
+    "title": "ក្រង AI",
+    "section": "PyPI Packages",
+    "text": "PyPI Packages\n\nTrorYongOCR: Optical Character Recognition Models with my design of model architecture (pip install tror-yong-ocr or more info here)\nNeoWhisper: Re-implementation of Whisper with the most recent attention technologies (pip install neo-whisper or more info here)\nTrorYongGPT: Small Language Models with the most recent attention technologies implemented (pip install tror-yong-lm or more info here)"
   }
 ]
