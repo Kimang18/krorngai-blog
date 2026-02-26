@@ -201,5 +201,264 @@
     "title": "ក្រង AI",
     "section": "PyPI Packages",
     "text": "PyPI Packages\n\nTrorYongOCR: Optical Character Recognition Models with my design of model architecture (pip install tror-yong-ocr or more info here)\nNeoWhisper: Re-implementation of Whisper with the most recent attention technologies (pip install neo-whisper or more info here)\nTrorYongGPT: Small Language Models with the most recent attention technologies implemented (pip install tror-yong-lm or more info here)"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#llm-is-a-computer-program",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#llm-is-a-computer-program",
+    "title": "So, what is an LLM anyway?",
+    "section": "LLM is a “computer program”",
+    "text": "LLM is a “computer program”\n\n\n\n\n\n\n\n\n\n\nAdapted from https://drive.google.com/file/d/1pxx_ZI7O-Nwl7ZLNk5hI3WzAsTLwvNU7/view of Andrej Karpathy"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#there-are-2-stages-in-creating-an-llm",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#there-are-2-stages-in-creating-an-llm",
+    "title": "So, what is an LLM anyway?",
+    "section": "There are 2 stages in creating an LLM",
+    "text": "There are 2 stages in creating an LLM"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "Pre-training: learn laws of human language and world facts\n\nneed an enormous amount of text corpus\nneed a well designed model architecture\nneed an enormous amount of computational resource\n\n\nThink of it like “compressing the knowledge into your model”"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-1",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-1",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "Pre-training: learn laws of human language and world facts\nFor Llama 2 70B, it is like “compressing the internet”\n\n\n\n\n\n\nSource from https://drive.google.com/file/d/1pxx_ZI7O-Nwl7ZLNk5hI3WzAsTLwvNU7/view of Andrej Karpathy"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-2",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-2",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "A neural network that predicts the next word in the sequence"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-3",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-3",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "To predict the next word, the neural network must first compress the world"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-4",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-4",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "The base model “dreams” internet documents\n\n\nSource from https://drive.google.com/file/d/1pxx_ZI7O-Nwl7ZLNk5hI3WzAsTLwvNU7/view of Andrej Karpathy"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-5",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-5",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "SFT: learn to interface with human"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-6",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-6",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "The instruct model is able to chat with you\nIt learns to answer (e.g. questions, commands, or making suggestions, etc.)"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-7",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-7",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "The instruct model is able to chat with you\nBut, it imitates a single ‘correct’ answer or straightly follow fact."
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-8",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-8",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "RLHF: learn human values and preferences"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-9",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-9",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "Summary: how to train your LLM\n\n\n\n\n\n\nPre-training\n\nPrepare large text corpus (~10TB of text for Llama2 70b)\nGet a cluster of GPUs (~6,000 GPUs for Llama2 70b)\nCompress the text into a neural network (pay ~$2M, wait ~12 days)\nObtain base model\n\n\n\nFinetuning\n\nWrite labeling instructions\nHire people, collect high quality ideal Q&A responses, and/or comparisons\nFinetune base model on this data (wait ~1 day)\nObtain chat model\nRun a lot of evaluations\nDeploy.\nMonitor, collect misbehaviors, go to Step 1."
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-10",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-10",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "Source Open Source LLM Development Landscape 2.0: 2025 Revisited"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-11",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-11",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "LLM scaling laws: exponential improvement is possible\nPerformance of LLMs is a smooth, well-behaved, predictable function of:\n\nthe number of parameters of the network (i.e. model size)\nthe amount of text we train on\n\nand the trends do not show signs of ‘topping out’.\nWe can expet more intelligence “for free” by scaling.\n\n\n\n\n\n\nSource Hoffmann et al. (2022) Training Compute-Optimal Large Language Models"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-12",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-12",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "We can expect a lot more “general capability” across all areas of knowledge"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-13",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-13",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "LLMs are still not smart enough\n\nThe reversal curse: Being trained on “A is B”, it fails to learn “B is A”.\n\n\n\nSource Figure 1 of Berglund et al. (2024) https://arxiv.org/abs/2309.12288"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-17",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-17",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "Source from https://youtu.be/zjkBMFhNj_g"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-18",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-18",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "Source from https://youtu.be/zjkBMFhNj_g"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-19",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-19",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "Source from https://youtu.be/zjkBMFhNj_g"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-20",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-20",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "We are entering a period of diminishing returns\n\n\n\n\nBase Model Seems to be an Upper Bound for Reasoning Capability (Yue et al. 2025)"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-21",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-21",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "We are entering a period of diminishing returns\n\nStock of high-quality language data will be exhausted likely before 2026 (Villalobos et al. 2022)\n\n\n\n\n\n“Il y a un moment donné où on arrive dans un regime où en fait on a fini de compresser la connaissance humaine” (sourced from this interview)\n– Arthur Mensch, CEO, Mistral AI"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-22",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-22",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "Customize LLMs to your task and context\nLLMs are trained to understand and exploit the context.\n \n\nSource 6 Common LLM Customization Strategies Briefly Explained"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-23",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-23",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "There are 3 fine-tuning techniques"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#a-few-solutions-for-fine-tuning-llms",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#a-few-solutions-for-fine-tuning-llms",
+    "title": "So, what is an LLM anyway?",
+    "section": "A few solutions for fine-tuning LLMs",
+    "text": "A few solutions for fine-tuning LLMs\n\nUnsloth: fast and now support multiGPU\nAxolotl: fast and support multiGPU\nTRL: fast and support multiGPU\nMLX-LM: fast and support multiGPU (Apple Silicon only)"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-24",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-24",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "More detail here"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#demo-fine-tune-llama-3.1-8b",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#demo-fine-tune-llama-3.1-8b",
+    "title": "So, what is an LLM anyway?",
+    "section": "Demo: fine-tune LLama 3.1 8B",
+    "text": "Demo: fine-tune LLama 3.1 8B\nUse QLoRA technique and mlabonne/FineTome-100k dataset\nInstall packages1\npip install unsloth vllm\nImport dependencies\nimport torch\nfrom unsloth import FastLanguageModel, is_bfloat16_supported\nfrom datasets import load_dataset\nfrom unsloth.chat_templates import get_chat_template\nfrom trl import SFTTrainer\nfrom transformers import TrainingArguments, TextStreamer"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-25",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-25",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "Load model and tokenizer\nLoad pre-quantized model in \\(4\\)-bit precision of meta-llama/Llama-3.1-8B-Instruct.\nmax_seq_length = 2048\nmodel, tokenizer = FastLanguageModel.from_pretrained(\n    model_name=\"unsloth/Meta-Llama-3.1-8B-bnb-4bit\",\n    max_seq_length=max_seq_length,\n    load_in_4bit=True,\n    dtype=None,\n)"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-26",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-26",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "Apply low rank adaption technique\nmodel = FastLanguageModel.get_peft_model(\n    model,\n    r=16,\n    lora_alpha=16,\n    lora_dropout=0,\n    target_modules=[\"q_proj\", \"k_proj\", \"v_proj\", \"up_proj\", \"down_proj\", \"o_proj\", \"gate_proj\"], \n    use_rslora=True,\n    use_gradient_checkpointing=\"unsloth\"\n)\n\nCheck for names of the linear modules"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#finetome-100k",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#finetome-100k",
+    "title": "So, what is an LLM anyway?",
+    "section": "FineTome-100k",
+    "text": "FineTome-100k\nHaving ShareGPT template"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-27",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-27",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "Chat template\nLlama3 uses ChatML template\n# ChatML template\n# messages = [\n#     {\"role\": \"system\", \"content\": \"...\"},\n#     {\"role\": \"user\", \"content\": \"...\"},\n#     {\"role\": \"assistant\", \"content\": \"...\"},\n# ]\n=&gt; Do the mapping between ShareGPT and ChatML\ntokenizer = get_chat_template(\n    tokenizer,\n    mapping={\"role\": \"from\", \"content\": \"value\", \"user\": \"human\", \"assistant\": \"gpt\"},\n    chat_template=\"chatml\",\n)\n\ndef apply_template(examples):\n    messages = examples[\"conversations\"]\n    text = [tokenizer.apply_chat_template(message, tokenize=False, add_generation_prompt=False) for message in messages]\n    return {\"text\": text}\n\ndataset = load_dataset(\"mlabonne/FineTome-100k\", split=\"train\")\ndataset = dataset.map(apply_template, batched=True)"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-28",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-28",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "We get text ready to be tokenized\nprint(dataset[\"text\"][0])\n# This gives something similar to below\n\"\"\"\n&lt;|im_start|&gt;system\nYou are a helpful assistant, who always provide explanation. Think like you are answering to a five year old.&lt;|im_end|&gt;\n&lt;|im_start|&gt;user\nRemove the spaces from the following sentence: It prevents users to suspect that there are some hidden products installed on theirs device.&lt;|im_end|&gt;\n&lt;|im_start|&gt;assistant\nItpreventsuserstosuspectthattherearesomehiddenproductsinstalledontheirsdevice.&lt;|im_end|&gt;\n\"\"\""
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-29",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-29",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "Training Setup\ntrainer=SFTTrainer(\n    model=model,\n    tokenizer=tokenizer,\n    train_dataset=dataset,\n    dataset_text_field=\"text\",\n    max_seq_length=max_seq_length,\n    dataset_num_proc=2,\n    packing=True,\n    args=TrainingArguments(\n        learning_rate=3e-4,\n        lr_scheduler_type=\"linear\",\n        per_device_train_batch_size=8,\n        gradient_accumulation_steps=2,\n        num_train_epochs=1,\n        fp16=not is_bfloat16_supported(),\n        bf16=is_bfloat16_supported(),\n        logging_steps=1,\n        optim=\"adamw_8bit\",\n        weight_decay=0.01,\n        warmup_steps=10,\n        output_dir=\"output\",\n        seed=0,\n    ),\n)\n\ntrainer.train()"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-30",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-30",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "Evaluation\nEvaluate your model on test dataset or different benchmarks and tools like llm-autoeval.\n# Simple inference\nmodel = FastLanguageModel.for_inference(model)\n\nmessages = [\n    {\"from\": \"human\", \"value\": \"Is 9.11 larger than 9.9?\"},\n]\ninputs = tokenizer.apply_chat_template(\n    messages,\n    tokenize=True,\n    add_generation_prompt=True,\n    return_tensors=\"pt\",\n).to(\"cuda\")\n\ntext_streamer = TextStreamer(tokenizer)\n_ = model.generate(input_ids=inputs, streamer=text_streamer, max_new_tokens=128, use_cache=True)"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-31",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#section-31",
+    "title": "So, what is an LLM anyway?",
+    "section": "",
+    "text": "Save and upload model\nOnce you’re satisfied with your model, you can merge the adapter and share it\n# save to local disk\nmodel.save_pretrained_merged(\"model\", tokenizer, save_method=\"merged_16bit\")\n# upload to huggingface repo: mlabonne/FineLlama-3.1-8B\nmodel.push_to_hub_merged(\"mlabonne/FineLlama-3.1-8B\", tokenizer, save_method=\"merged_16bit\")\nFor faster inference with llama.cpp (or LMStudio, Ollama, etc.), you can upload the GGUF formats\n# available quantization methods\nquant_methods = [\"q2_k\", \"q3_k_m\", \"q4_k_m\", \"q5_k_m\", \"q6_k\", \"q8_0\"]\n# push quantized format to repo: mlabonne/FineLlama-3.1-8B-GGUF\nfor quant in quant_methods:\n    model.push_to_hub_gguf(\"mlabonne/FineLlama-3.1-8B-GGUF\", tokenizer, quant)"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#krorngai-yt-channel",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#krorngai-yt-channel",
+    "title": "So, what is an LLM anyway?",
+    "section": "KrorngAI YT Channel",
+    "text": "KrorngAI YT Channel\n\n\nក្រង AI Facebook: ក្រង AI\nMy Website: https://kimang18.github.io/"
+  },
+  {
+    "objectID": "LLMPresentationITC/llm_presentation_ITC_LBE.html#footnotes",
+    "href": "LLMPresentationITC/llm_presentation_ITC_LBE.html#footnotes",
+    "title": "So, what is an LLM anyway?",
+    "section": "Footnotes",
+    "text": "Footnotes\n\n\nFor Colab, you need specific installation (see here)↩︎"
+  },
+  {
+    "objectID": "WhatIsAnLLMAnyway/index.html",
+    "href": "WhatIsAnLLMAnyway/index.html",
+    "title": "What is an LLM Anyway?",
+    "section": "",
+    "text": "Check out my presentation here"
   }
 ]
