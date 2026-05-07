@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Kimang Khun">
+<meta name="dcterms.date" content="2026-05-07">
+<meta name="description" content="Permuted AutoRegressive Sequence Modeling for Automatic Speech Recognition">
+
+<title>TrorYongASR: Permuted AutoRegressive Sequence Modeling for Automatic Speech Recognition – ក្រង AI</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-b6f0216ad1d1f1576d3a901583698661.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">ក្រង AI</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#abstract" id="toc-abstract" class="nav-link active" data-scroll-target="#abstract">Abstract</a></li>
+  <li><a href="#evaluation" id="toc-evaluation" class="nav-link" data-scroll-target="#evaluation">Evaluation</a>
+  <ul class="collapse">
+  <li><a href="#metrics-and-results" id="toc-metrics-and-results" class="nav-link" data-scroll-target="#metrics-and-results">Metrics and Results</a>
+  <ul class="collapse">
+  <li><a href="#language-detection" id="toc-language-detection" class="nav-link" data-scroll-target="#language-detection">Language Detection</a></li>
+  <li><a href="#transcription" id="toc-transcription" class="nav-link" data-scroll-target="#transcription">Transcription</a></li>
+  </ul></li>
+  <li><a href="#result-summary" id="toc-result-summary" class="nav-link" data-scroll-target="#result-summary">Result Summary</a></li>
+  <li><a href="#downstram-tasks-and-limitations" id="toc-downstram-tasks-and-limitations" class="nav-link" data-scroll-target="#downstram-tasks-and-limitations">Downstram Tasks and Limitations</a></li>
+  </ul></li>
+  <li><a href="#troryongasr-design" id="toc-troryongasr-design" class="nav-link" data-scroll-target="#troryongasr-design">TrorYongASR Design</a>
+  <ul class="collapse">
+  <li><a href="#rope-integration-in-auditory-lingual-decoder" id="toc-rope-integration-in-auditory-lingual-decoder" class="nav-link" data-scroll-target="#rope-integration-in-auditory-lingual-decoder">RoPE Integration in Auditory-lingual Decoder</a>
+  <ul class="collapse">
+  <li><a href="#position-basis" id="toc-position-basis" class="nav-link" data-scroll-target="#position-basis">Position Basis</a></li>
+  <li><a href="#null-context" id="toc-null-context" class="nav-link" data-scroll-target="#null-context">Null Context</a></li>
+  </ul></li>
+  <li><a href="#attention-mask-manipulation" id="toc-attention-mask-manipulation" class="nav-link" data-scroll-target="#attention-mask-manipulation">Attention Mask Manipulation</a></li>
+  </ul></li>
+  <li><a href="#related-work" id="toc-related-work" class="nav-link" data-scroll-target="#related-work">Related Work</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">TrorYongASR: Permuted AutoRegressive Sequence Modeling for Automatic Speech Recognition</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Science</div>
+    <div class="quarto-category">Technology</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Permuted AutoRegressive Sequence Modeling for Automatic Speech Recognition
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Kimang Khun <a href="mailto:kimang.khun@polytechnique.org" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> <a href="https://orcid.org/0000-0002-1939-4332" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 7, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="abstract" class="level1">
+<h1>Abstract</h1>
+<p><strong>TrorYongASR</strong> is an Encoder-Decoder model for Automatic Speech Recognition (ASR). It is designed for <code>transcription</code> and <code>translation</code> tasks and language detection based on audio. It is smaller than <code>Whisper</code> model, and has a competitive performance in term of <code>WER</code> and <code>inference speed</code>. TrorYongASR is inspired by PARSeq’s architecture <span class="citation" data-cites="bautista2022scene">(<a href="#ref-bautista2022scene" role="doc-biblioref">Bautista and Atienza 2022</a>)</span>: the decoder has only one layer and predicts tokens corresponding to the observed positions. Currently, TrorYongASR has two sizes: <code>tiny</code> and <code>small</code>. Available pre-trained weights of both sizes support <code>Khmer</code> and <code>English</code> languages, and TrorYongASR can be trained to support more languages without compromising any advantages mentioned earlier. Leveraging pre-trained audio encoder of <code>Whisper</code> <span class="citation" data-cites="radford2023robust">(<a href="#ref-radford2023robust" role="doc-biblioref">Radford et al. 2023</a>)</span> as initialization, the pre-trained TrorYongASR achieves <code>WER</code> of 75.88% and 54.33% for Khmer and English respectively in <code>tiny</code> configuration; and of ??? and ??? in <code>small</code> configuration.</p>
+</section>
+<section id="evaluation" class="level1">
+<h1>Evaluation</h1>
+<p>The evaluation assesses two capabilities — 1) language detection and 2) transcription — on two datasets (<a href="https://huggingface.co/datasets/Kimang18/google-fleurs-km-kh"><code>google/fleurs</code></a> for Khmer and <a href="https://huggingface.co/datasets/openslr/librispeech_asr"><code>openslr/librispeech_asr</code></a> for English). All results are from the <strong>test split</strong> of each dataset, representing the model’s generalization ability to unseen data.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 22%">
+<col style="width: 11%">
+<col style="width: 17%">
+<col style="width: 49%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Dataset</th>
+<th>Language</th>
+<th>Testing examples</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>google/fleurs</strong></td>
+<td>Khmer</td>
+<td>765</td>
+<td>Multi-lingual dataset with Khmer language samples</td>
+</tr>
+<tr class="even">
+<td><strong>librispeech.clean</strong></td>
+<td>English</td>
+<td>2620</td>
+<td>Clean speech dataset for English transcription</td>
+</tr>
+</tbody>
+</table>
+<p>Audios longer than <code>30 seconds</code> are excluded from the evaluation (that is why <code>google/fleurs</code> has 765 examples instead of 771).</p>
+<p><strong>TrorYongASR</strong> currently has 2 configurations as the following</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"><strong>Model Size</strong></th>
+<th style="text-align: center;">Tiny</th>
+<th style="text-align: center;">Small</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong>Audio Encoder</strong></td>
+<td style="text-align: center;">4 layers, 6 heads</td>
+<td style="text-align: center;">12 layers, 12 heads</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>Audio Context</strong></td>
+<td style="text-align: center;">1500</td>
+<td style="text-align: center;">1500</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>Text Decoder</strong></td>
+<td style="text-align: center;">1 layer, 12 heads</td>
+<td style="text-align: center;">1 layer, 24 heads</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>Text Context</strong></td>
+<td style="text-align: center;">1024</td>
+<td style="text-align: center;">1024</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>Embedding Dim</strong></td>
+<td style="text-align: center;">384</td>
+<td style="text-align: center;">768</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>Parameters</strong></td>
+<td style="text-align: center;">29M</td>
+<td style="text-align: center;">136M</td>
+</tr>
+</tbody>
+</table>
+<p>The audio array are processed to log-mel spectrogram with <code>80</code> mels (the same as Whisper models of the same size)</p>
+<section id="metrics-and-results" class="level2">
+<h2 class="anchored" data-anchor-id="metrics-and-results">Metrics and Results</h2>
+<section id="language-detection" class="level3">
+<h3 class="anchored" data-anchor-id="language-detection">Language Detection</h3>
+<p>Language detection measures model’s capability to recognize the spoken language from audio input. Since TrorYongASR currently supports 2 languages, this task becomes binary classification task. Classic metrics are used:</p>
+<ul>
+<li><strong>Precision</strong>: Proportion of predicted languages that are correct</li>
+<li><strong>Recall</strong>: Proportion of actual language samples correctly identified</li>
+<li><strong>Accuracy</strong>: Proportion of total predictions that are correct</li>
+<li><strong>F1-score</strong>: Harmonic mean of precision and recall</li>
+</ul>
+<p><strong>Results:</strong></p>
+<table class="table-striped table-hover caption-top table">
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>Metrics</th>
+<th>Khmer (<code>fleurs</code>)</th>
+<th>English (<code>librispeech.clean</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Tiny</td>
+<td>Precision</td>
+<td>100%</td>
+<td>100%</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>Recall</td>
+<td>100%</td>
+<td>100%</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>F1-score</td>
+<td>100%</td>
+<td>100%</td>
+</tr>
+<tr class="even">
+<td>Small</td>
+<td>Precision</td>
+<td>100%</td>
+<td>99%</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>Recall</td>
+<td>96%</td>
+<td>100%</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>F1-score</td>
+<td>98%</td>
+<td>99 %</td>
+</tr>
+</tbody>
+</table>
+<p>Tiny size achieved perfect language detection performance on both datasets, indicating excellent binary classification capability for distinguishing between Khmer and English audio. Small size performs slightly worst by tending to predict English language.</p>
+<p>The 100% language detection scores may appear unusually high. This is expected because during pre-training, the model performs permutations on word tokens starting from position 3, while the first three positions (start token, language token, and task token) remain fixed. Since language detection relies on the language token at position 1, and this token is never permuted during pre-training, the model can achieve perfect accuracy on language detection tasks.</p>
+</section>
+<section id="transcription" class="level3">
+<h3 class="anchored" data-anchor-id="transcription">Transcription</h3>
+<p>For transcription task, 3 metrics below are used</p>
+<ul>
+<li><strong>Token Error Rate (TER)</strong>: Proportion of incorrectly transcribed tokens</li>
+<li><strong>Character Error Rate (CER)</strong>: Proportion of characters that are incorrect</li>
+<li><strong>Word Error Rate (WER)</strong>: Proportion of words that are incorrect</li>
+</ul>
+<p>Token Error Rate measures model’s capability in predicting the next token given the audio input and the current sequence of tokens. This metric is weaker than Word Error Rate (WER) and Character Error Rate (CER) because it doesn’t account for insertions, deletions, substitutions, and autoregression as comprehensively. Token Error Rate is used here because Khmer text lacks word boundaries, making WER and CER calculations challenging without additional preprocessing.</p>
+<p><strong>Transcription Results:</strong></p>
+<table class="table-striped table-hover caption-top table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 8%">
+<col style="width: 19%">
+<col style="width: 33%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>Metric</th>
+<th>Khmer (<code>fleurs</code>)</th>
+<th>English (<code>librispeech.clean</code>)</th>
+<th>Mixed (Khmer + English)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Tiny</strong></td>
+<td>WER</td>
+<td>75.88%</td>
+<td>54.33%</td>
+<td>60.36%</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>CER</td>
+<td>54.99%</td>
+<td>42.41%</td>
+<td>46.18%</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>TER</td>
+<td>54%</td>
+<td>17%</td>
+<td>27%</td>
+</tr>
+<tr class="even">
+<td><strong>Small</strong></td>
+<td>WER</td>
+<td>50.46%</td>
+<td>21.75%</td>
+<td>29.78%</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>CER</td>
+<td>35.89%</td>
+<td>16.58%</td>
+<td>22.37%</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>TER</td>
+<td>43%</td>
+<td>8%</td>
+<td>18%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key Observations:</strong> - The tiny model shows strong performance on English (54.33% WER, 42.41% CER, 17% TER) - Performance drops for Khmer (75.88% WER, 54.99% CER, 54% TER) - The small model shows strong performance on English (21.75% WER, 16.58% CER, 8% token error rate) - Performance for Khmer is moderate (50.46% WER, 35.89% CER, 43% token error rate) - The larger model benefits from increased embedding dimension (768 vs 384) and more layers for audio encoder (12 vs 4)</p>
+<p><strong>Note:</strong> To compute <code>CER</code> and <code>WER</code>, whitespaces are added between words in Khmer text (Khmer text does not have word boundaries like English text). To do so, <code>khmercut</code> PyPI package is used to tokenize Khmer text into words, and then the words are joined back together with whitespaces.</p>
+<p><strong>WER Comparison with Whisper:</strong></p>
+<table class="table-striped table-hover caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 12%">
+<col style="width: 11%">
+<col style="width: 31%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Size</th>
+<th>Model</th>
+<th>Parameters</th>
+<th>Khmer (<code>fleurs</code>)</th>
+<th>English (<code>librispeech.clean</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Tiny</strong></td>
+<td>TrorYongASR</td>
+<td>29M</td>
+<td>75.88%</td>
+<td>54.33%</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>Whisper</td>
+<td>39M</td>
+<td>100.6%</td>
+<td>7.6%</td>
+</tr>
+<tr class="odd">
+<td><strong>Small</strong></td>
+<td>TrorYongASR</td>
+<td>135M</td>
+<td>50.46%</td>
+<td>21.75%</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>Whisper</td>
+<td>244M</td>
+<td>104.4%</td>
+<td>3.4%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key Observations:</strong></p>
+<ul>
+<li>Whisper models have more parameters for comparable sizes (39M vs 29M for Tiny, 244M vs 135M for Small)</li>
+<li>Whisper shows significantly lower word error rates on English (7.6% vs 54.33% for Tiny, 3.4% vs 12.95% for Small)</li>
+<li>Whisper performs worse on Khmer (100.6% vs 75.88% for Tiny, 104.4% vs 50.46% for Small)</li>
+<li>Error rates &gt; 100% for Whisper on Khmer indicate the model is overfitting to the training data</li>
+</ul>
+<p><strong>Note:</strong> <code>WER</code> data of Whisper is taken from their <a href="https://arxiv.org/abs/2212.04356">paper</a>.</p>
+</section>
+</section>
+<section id="result-summary" class="level2">
+<h2 class="anchored" data-anchor-id="result-summary">Result Summary</h2>
+<p><strong>Language Detection:</strong> Both model sizes achieved great performance across all metrics (Precision, Recall, F1-score) on both datasets, indicating excellent binary classification capability for distinguishing between Khmer and English audio. This high score is expected because during pre-training, the model performs permutations on word tokens starting from position 3, while the first three positions (start token, language token, and task token) remain fixed. Since language detection relies on the language token at position 1, and this token is never permuted during pre-training, the model can achieve perfect accuracy on language detection tasks.</p>
+<p><strong>Transcription:</strong> The Small model shows strong performance on English (21.75% WER, 16.58% CER, 8% TER) and moderate performance for Khmer (50.46% WER, 35.89% CER, 43% TER). The Tiny model shows strong performance on English (54.33% WER, 42.41% CER, 17% TER) but significantly lower performance for Khmer (75.88% WER, 54.99% CER, 54% TER). This shows that <code>TrorYongASR</code> can be scaled to get higher performance.</p>
+<p><strong>Note on Translation Task:</strong> The models are also trained for <code>translation</code> task, but evaluation is deferred to future work due to scarce data (there are only 2000 examples from Khmer audio to English text, and 1000 examples from English audio to Khmer text in the pre-training).</p>
+</section>
+<section id="downstram-tasks-and-limitations" class="level2">
+<h2 class="anchored" data-anchor-id="downstram-tasks-and-limitations">Downstram Tasks and Limitations</h2>
+<p>TrorYongASR can be integrated into:</p>
+<ul>
+<li>IoT devices: Smart speakers, voice assistants</li>
+<li>Mobile application: Android/iOS apps with speech recognition</li>
+<li>Larger ASR systems: As a component in multi-language ASR pipelines</li>
+</ul>
+<p>Due to the lack of training dataset, TrorYongASR does not support</p>
+<ul>
+<li>timestamps prediction</li>
+<li>voice activity detection</li>
+<li>translation performance is still limited</li>
+</ul>
+</section>
+</section>
+<section id="troryongasr-design" class="level1">
+<h1>TrorYongASR Design</h1>
+<p>In sequence modeling, deep learning models are trained to generate <em>future</em> tokens conditioned on <em>past</em> tokens. Concretely, for a given audio <span class="math inline">\({\boldsymbol{x}}\)</span> and its corresponding <span class="math inline">\(T\)</span>-length text tokens <span class="math inline">\({\boldsymbol{y}}\)</span>, the likelihood for the standard autoregressive model is given by <span id="eq-ar"><span class="math display">\[
+\mathbb{P}_\theta({\boldsymbol{y}}|{\boldsymbol{x}})
+=
+p_\theta(y_1|{\boldsymbol{x}})\times
+p_\theta(y_2|y_1, {\boldsymbol{x}})\times
+\dots \times
+p_\theta(y_T|y_{T-1},\dots, y_1, {\boldsymbol{x}})
+=\prod_{t=1}^Tp_\theta(y_t|{\boldsymbol{y}}_{&lt;t}, {\boldsymbol{x}})
+\tag{1}\]</span></span> where <span class="math inline">\(\theta\)</span> is the parameters of the model. One tries to find <span class="math inline">\(\theta\)</span> that minimizes the negative log of <a href="#eq-ar" class="quarto-xref">Equation&nbsp;1</a> <span class="math display">\[\begin{equation}
+{\mathrm{NLL}}(\theta) = -\sum_{t=1}^T\log p_{\theta}(y_t|{\boldsymbol{y}}_{&lt;t}, {\boldsymbol{x}})
+\end{equation}\]</span> This method is known as <em>monotonic</em> autoregressive generation.</p>
+<p>Inspired by PARSeq model <span class="citation" data-cites="bautista2022scene">(<a href="#ref-bautista2022scene" role="doc-biblioref">Bautista and Atienza 2022</a>)</span>, TrorYongASR adapts Permutation Language Modeling (PLM) <span class="citation" data-cites="yang2019xlnet">(<a href="#ref-yang2019xlnet" role="doc-biblioref">Yang et al. 2019</a>)</span> for Automatic Speech Recognition (ASR). Let <span class="math inline">\({\mathcal{Z}}_T\)</span> be the set of all possible permutations of <span class="math inline">\(\{1,2,\dots,T\}\)</span>. Without loss of generality, <span class="math inline">\(T\)</span> can be fixed and omitted from the expression to help the readability. Let <span class="math inline">\({\boldsymbol{z}}\in{\mathcal{Z}}\)</span> be a permutation that specifies an ordering of the text tokens in <span class="math inline">\({\boldsymbol{y}}\)</span> and define</p>
+<p><span class="math display">\[\begin{align*}
+\mathbb{P}_\theta({\boldsymbol{y}}_{{\boldsymbol{z}}}|{\boldsymbol{x}})
+=
+p_\theta(y_{z_1}|{\boldsymbol{x}})\times
+p_\theta(y_{z_2}|y_{z_1}, {\boldsymbol{x}})\times
+\dots \times
+p_\theta(y_{z_T}|y_{z_{T-1}},\dots, y_{z_1}, {\boldsymbol{x}})
+=\prod_{t=1}^Tp_\theta(y_{z_t}|{\boldsymbol{y}}_{{\boldsymbol{z}}_{&lt;t}}, {\boldsymbol{x}})
+\end{align*}\]</span> as the likelihood for a given <span class="math inline">\({\boldsymbol{z}}\)</span>. So, <a href="#eq-ar" class="quarto-xref">Equation&nbsp;1</a> is the case where <span class="math inline">\(z_t=t, \forall 1\le t\le T\)</span>.</p>
+<p>TrorYongASR finds <span class="math inline">\(\theta\)</span> that minimizes the negative log-likelihood</p>
+<p><span id="eq-plm"><span class="math display">\[
+{\mathbb{E}}_{{\boldsymbol{z}}\in{\mathcal{Z}}}\left[-\sum_{t=1}^T\log p_{\theta}(y_{z_t}|{\boldsymbol{y}}_{{\boldsymbol{z}}_{&lt;t}}, {\boldsymbol{x}})\right]
+\tag{2}\]</span></span></p>
+<p>It is clear that TrorYongASR is more general than <em>monotonic</em> autoregressive method that predicts tokens in a single standard direction, namely left-to-right. Moreover, the objective function <a href="#eq-plm" class="quarto-xref">Equation&nbsp;2</a> only requires modification on <em>Auditory-lingual Decoder</em> (<em>Audio Encoder</em> can follow the one of Whisper model). An overview of TrorYongASR architecture is given in <a href="#fig-archit" class="quarto-xref">Figure&nbsp;1</a>.</p>
+<p>Performing <a href="#eq-plm" class="quarto-xref">Equation&nbsp;2</a> means training all <span class="math inline">\(T!\)</span> factorizations which is computationally expensive in pratice. Following PARSeq, TrorYongASR compromises this by choosing 8 permutations for each audio. That is, TrorYongASR minimizes the following</p>
+<p><span id="eq-tror"><span class="math display">\[
+\widetilde{{\mathrm{NLL}}}(\theta) = \frac{1}{8} \sum_{1\le k\le 8}\left[-\sum_{t=1}^T\log p_{\theta}(y_{z_t^k}|{\boldsymbol{y}}_{{\boldsymbol{z}}^k_{&lt;t}}, {\boldsymbol{x}})\right]
+\tag{3}\]</span></span></p>
+<p>As mentioned in <span class="citation" data-cites="bautista2022scene">(<a href="#ref-bautista2022scene" role="doc-biblioref">Bautista and Atienza 2022</a>)</span>, the permutation <span class="math inline">\({\boldsymbol{z}}^k\)</span> is encapsulated by the attention mask. For example, the standard casual attention mask enforces identity permutation. So, TrorYongASR also crafts the attention mask to enforce the ordering specified by <span class="math inline">\({\boldsymbol{z}}^k\)</span>. <a href="#tbl-panel" class="quarto-xref">Table&nbsp;1</a> gives an example with 4 permutations and their corresponding attention mask.</p>
+<div id="fig-archit" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-archit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./figures/architecture5.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-archit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: TrorYongASR architecture. <em>Dropout</em> layers are omitted due to space constraints, <span class="math inline">\([B]\)</span>, <span class="math inline">\([L]\)</span>, <span class="math inline">\([T]\)</span>, <span class="math inline">\([E]\)</span>, and <span class="math inline">\([P]\)</span> are <em>begin-of-sequence</em>, <em>language</em>, <em>task</em>, <em>end-of-sequence</em>, and <em>padding</em> tokens, respectively. This figures presents the case having 16 distinct target prediction positions. The QKV-projection is explicitly shown here because particularly for TrorYongASR, the single position basis <span class="math inline">\({\mathbf{p}}\)</span> is used for each position to directly form query projection (differently from the standard decoder of <span class="citation" data-cites="vaswani2017attention">(<a href="#ref-vaswani2017attention" role="doc-biblioref">Vaswani et al. 2017</a>)</span>, the linear layer for query projection is not required) while context vectors are the token embeddings of input context and are projected to keys and values. Root-mean-squared normalization and RoPE are applied to query and key projections. Attention masks are generated from the choosen permutations and are used only for the <em>context-position</em> attention. The last linear layer outputs logits over the vocabulary set. These logits are then used to compute cross-entropy loss.
+</figcaption>
+</figure>
+</div>
+<p>In the following sections, I first explain how I integrate RoPE in TrorYongASR as it is not obvious when query vectors contain purely positional information. Then, I elaborate attention mask manipulation specifically for ASR task where the decoder requires not just begin-of-sequence token (<code>sot</code> token for Whisper), but also language and task token in order to decode an audio.</p>
+<section id="rope-integration-in-auditory-lingual-decoder" class="level2">
+<h2 class="anchored" data-anchor-id="rope-integration-in-auditory-lingual-decoder">RoPE Integration in Auditory-lingual Decoder</h2>
+<p>In PARSeq <span class="citation" data-cites="bautista2022scene">(<a href="#ref-bautista2022scene" role="doc-biblioref">Bautista and Atienza 2022</a>)</span>, the decoder requires 3 inputs: <em>position</em>, <em>context</em>, and <em>audio encoding</em>. Its first Multi-head Attention module is used for <em>context-position</em> attention: query vectors encode the target prediction positions whereas context vectors integrate both semantic embeddings and positional information. This decouples the context from the target position, allowing the model to learn from PLM (see <span class="citation" data-cites="bautista2022scene">(<a href="#ref-bautista2022scene" role="doc-biblioref">Bautista and Atienza 2022</a>)</span> for more detail). PARSeq achieves this idea by using position embeddings as query vectors and adding position embeddings to token embeddings to form context vectors. However, RoPE is a rotational operator. So, one must design query vectors such that each position holds the same neutral information enabling RoPE to inject positional information right before the attention mechanism.</p>
+<section id="position-basis" class="level3">
+<h3 class="anchored" data-anchor-id="position-basis">Position Basis</h3>
+<p>TrorYongASR uses a single embedding vector <span class="math inline">\({\mathbf{p}}\in {\mathbb{R}}^{d}\)</span>, where <span class="math inline">\(d\)</span> is the embedding dimension, for each target prediction position to form query projection directly.<!-- and let RoPE injects positional information. --> This embedding vector <span class="math inline">\({\mathbf{p}}\in{\mathbb{R}}^{d}\)</span> is learnable and can be understood as <strong>position basis</strong>. Also, the context vectors are just token embeddings. The positional information are incorporated into queries and keys via the rotational operator. This preserves the decoupling concept from PARSeq while enabling RoPE for better performance.</p>
+<p>The motivation to use position basis <span class="math inline">\({\mathbf{p}}\)</span> as query projection is due to 2 reasons. Firstly, one could use <span class="math inline">\({\mathbf{p}}'\in{\mathbb{R}}^{d}\)</span> to form query vectors because positional information is incorporated via RoPE operation after query projection. Secondly, let <span class="math inline">\(W_q\in{\mathbb{R}}^{d}\)</span> be the weights of the linear layer. The query projection of any target prediction position is given by <span class="math inline">\(W_q{\mathbf{p}}'\in{\mathbb{R}}^{d}\)</span>. Both <span class="math inline">\(W_q\)</span> and <span class="math inline">\({\mathbf{p}}'\)</span> are learnable. So, one can save parameters by directly model <span class="math inline">\(W_q{\mathbf{p}}'\)</span> as <span class="math inline">\({\mathbf{p}}\)</span>.</p>
+</section>
+<section id="null-context" class="level3">
+<h3 class="anchored" data-anchor-id="null-context">Null Context</h3>
+<p>In PARSeq’s implementation, begin-of-sequence token, denoted by <span class="math inline">\([B]\)</span>, is assigned as null context and does not contain positional information. TrorYongASR preserves this by applying null rotation to the embedding of <span class="math inline">\([B]\)</span>. So, from position 1 onward, <em>keys</em> receive rotation that is one position slower than <em>queries</em>. For example, position 0 at index 0 of query projection, and language token <span class="math inline">\([L]\)</span> at index 1 of key projection both receive the same rotation. The same for position 1 at index 1 of query project, and task token <span class="math inline">\([T]\)</span> at index 2 of key projection and so on.</p>
+</section>
+</section>
+<section id="attention-mask-manipulation" class="level2">
+<h2 class="anchored" data-anchor-id="attention-mask-manipulation">Attention Mask Manipulation</h2>
+<p>Following Whisper, TrorYongASR has 3 start-of-text tokens: begin-of-sequence, language, and task tokens. When generating permutations, the 3 tokens remain fixed and only text tokens are permuted. <a href="#tbl-panel" class="quarto-xref">Table&nbsp;1</a> shows an example of 4 permutations of three-element text sequence. <a href="#tbl-first" class="quarto-xref">Table&nbsp;1 (a)</a> corresponds to the standard autoregressive model with the standard causal attention mask.</p>
+<div id="tbl-panel" class="quarto-layout-panel anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-panel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Illustration of AR attention masks for each permutation. The table header (with the <span class="math inline">\([B]\)</span> token) pertains to the input context, while the header column (with the <span class="math inline">\([E]\)</span> token at position <span class="math inline">\(6\)</span>) corresponds to the output tokens. <span class="math inline">\(1\)</span> means that the output token has conditional dependency on the corresponding input token. <span class="math inline">\(0\)</span> means that no information flows from input to output. For instance, the position of <span class="math inline">\([L]\)</span> has conditional dependency on token <span class="math inline">\([B]\)</span>, but no information flows from token <span class="math inline">\([L]\)</span> to the position of <span class="math inline">\([L]\)</span>. Note that regardless of permutations, position <span class="math inline">\(6\)</span> corresponding to token <span class="math inline">\([E]\)</span> has information from all input tokens, and information of token <span class="math inline">\([B]\)</span>, <span class="math inline">\([L]\)</span>, and <span class="math inline">\([T]\)</span> flow to all text token positions (in particular, information of token <span class="math inline">\([B]\)</span> flows to all positions). For notation, <span class="math inline">\([B]\)</span> is begin-of-sequence token, <span class="math inline">\([L]\)</span> is language token, <span class="math inline">\([T]\)</span> is task token, and <span class="math inline">\([E]\)</span> is end-of-sequence token.
+</figcaption>
+<div aria-describedby="tbl-panel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="tbl-panel" style="flex-basis: 50.0%;justify-content: center;">
+<div id="tbl-first" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-first-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) <span class="math inline">\({\boldsymbol{z}}^1:= [1,2,3,4,5,6]\)</span>
+</figcaption>
+<div aria-describedby="tbl-first-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;"><span class="math inline">\([B]\)</span></th>
+<th style="text-align: right;"><span class="math inline">\([L]\)</span></th>
+<th style="text-align: right;"><span class="math inline">\([T]\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(y_1\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(y_2\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(y_3\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\([L]\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\([T]\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(y_1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(y_2\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(y_3\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\([E]\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="tbl-panel" style="flex-basis: 50.0%;justify-content: center;">
+<div id="tbl-second" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-second-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) <span class="math inline">\({\boldsymbol{z}}^2:= [1,2,3,6,5,4]\)</span>
+</figcaption>
+<div aria-describedby="tbl-second-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;"><span class="math inline">\([B]\)</span></th>
+<th style="text-align: right;"><span class="math inline">\([L]\)</span></th>
+<th style="text-align: right;"><span class="math inline">\([T]\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(y_1\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(y_2\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(y_3\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\([L]\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\([T]\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(y_1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(y_2\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(y_3\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\([E]\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="tbl-panel" style="flex-basis: 50.0%;justify-content: center;">
+<div id="tbl-third" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-third-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(c) <span class="math inline">\({\boldsymbol{z}}^3:= [1,2,3,4,6,5]\)</span>
+</figcaption>
+<div aria-describedby="tbl-third-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;"><span class="math inline">\([B]\)</span></th>
+<th style="text-align: right;"><span class="math inline">\([L]\)</span></th>
+<th style="text-align: right;"><span class="math inline">\([T]\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(y_1\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(y_2\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(y_3\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\([L]\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\([T]\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(y_1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(y_2\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(y_3\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\([E]\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="tbl-panel" style="flex-basis: 50.0%;justify-content: center;">
+<div id="tbl-fourth" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-fourth-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(d) <span class="math inline">\({\boldsymbol{z}}^4:= [1,2,3,5,6,4]\)</span>
+</figcaption>
+<div aria-describedby="tbl-fourth-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;"><span class="math inline">\([B]\)</span></th>
+<th style="text-align: right;"><span class="math inline">\([L]\)</span></th>
+<th style="text-align: right;"><span class="math inline">\([T]\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(y_1\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(y_2\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(y_3\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\([L]\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\([T]\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(y_1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(y_2\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(y_3\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\([E]\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</figure>
+</div>
+<p>So, the main implementation is to generate permutation <span class="math inline">\({\boldsymbol{z}}^k\)</span> and derive the corresponding attention mask like <a href="#tbl-panel" class="quarto-xref">Table&nbsp;1</a>.</p>
+</section>
+</section>
+<section id="related-work" class="level1">
+<h1>Related Work</h1>
+<p>Whisper of OpenAI is a very popular model for ASR. Whisper supports around 100 languages and offers 2 tasks: 1) transcription and 2) translation <span class="citation" data-cites="radford2023robust">(<a href="#ref-radford2023robust" role="doc-biblioref">Radford et al. 2023</a>)</span>. Thanks to its performance, new technologies are developped around Whisper such as <a href="https://github.com/SYSTRAN/faster-whisper">FasterWhisper</a> that uses CTranslate2 to improve the inference speed of transformer blocks in Whisper and provides more functionalities such as voice activity detection. WhisperLive, and WhisperStreaming <span class="citation" data-cites="machavcek2023turning">(<a href="#ref-machavcek2023turning" role="doc-biblioref">Macháček, Dabre, and Bojar 2023</a>)</span> are developped for real-time transcription based on Whisper model. However, Whisper requires a descent amount of VRAM to operate. For example, Whisper-tiny requires around 1GB of VRAM while Whisper-small requires around 2GB <span class="citation" data-cites="radford2023robust">(<a href="#ref-radford2023robust" role="doc-biblioref">Radford et al. 2023</a>)</span>. This makes it challenging for limited hardware.</p>
+<p>PARSeq <span class="citation" data-cites="bautista2022scene">(<a href="#ref-bautista2022scene" role="doc-biblioref">Bautista and Atienza 2022</a>)</span> is a method to solve the task of recognizing text from the cropped regions in natural scenes. This method achieves state-of-the-art (SOTA) results in Scene Text Recognition(STR) benchmarks (91.9% accuracy) by just using synthetic training data <span class="citation" data-cites="bautista2022scene">(<a href="#ref-bautista2022scene" role="doc-biblioref">Bautista and Atienza 2022</a>)</span>. The key innovation of PARSeq (<a href="https://github.com/baudm/parseq">https://github.com/baudm/parseq)</a>) is to implement Permuted Autoregressive Sequence Modeling <span class="citation" data-cites="yang2019xlnet">(<a href="#ref-yang2019xlnet" role="doc-biblioref">Yang et al. 2019</a>)</span> in the training process: in addition to left-to-right and right-to-left autoregression, PARSeq also does permuted orders of autoregression. This leads to a densification of training signal. In consequences, PARSeq uses just one decoder block to obtain the SOTA result.</p>
+<p>This core idea in PARSeq’s implementation is compatible with Whisper architecture and enable reduction of the number of decoder blocks. Actually, OpenAI already tried to decrease the number of decoder blocks of Whisper-large aiming to reduce the number of parameters and increase the inference speed. Concretely, the trained Whisper-large-v3 is fine-tuned and pruned to Whisper-large-v3-turbo and the number of decoder blocks is decreased from 32 to 4 respectively.</p>
+<!--
+# Working with Data
+
+Efficient data preprocessing is critical for training TrorYongASR at scale.
+We pretokenize both text labels and audio features before uploading to Hugging Face to reduce compute during training and enable faster iteration.
+
+## Text Pretokenization
+
+Text labels are converted to token IDs using the Whisper tokenizer and stored as `uint16` arrays.
+Since Whisper's vocabulary size is $51,865$ tokens, `uint16` (max value $65,535$) is sufficient to represent all token IDs while halving memory compared to `int32`.
+
+```python
+import numpy as np
+from transformers import WhisperTokenizer
+
+tokenizer = WhisperTokenizer.from_pretrained("openai/whisper-tiny")
+
+def pretokenize_text(texts: list[str], max_length: int = 448) -> np.ndarray:
+    """Convert texts to token IDs and pad/truncate to max_length."""
+    token_ids = []
+    for text in texts:
+        encoded = tokenizer(
+            text,
+            max_length=max_length,
+            truncation=True,
+            padding="max_length",
+            return_tensors="np"
+        )
+        token_ids.append(encoded["input_ids"][0])
+    
+    # Stack and cast to uint16
+    token_array = np.stack(token_ids).astype(np.uint16)
+    return token_array
+```
+
+The pretokenized arrays can be saved as `.npy` files or memory-mapped for efficient loading:
+
+```python
+# Save pretokenized text
+np.save("train_token_ids.npy", token_ids, allow_pickle=False)
+
+# Or use memory mapping for large datasets
+memmap = np.memmap("train_token_ids.dat", dtype=np.uint16, mode="w+", shape=(num_samples, max_length))
+memmap[:] = token_ids
+```
+
+## Audio Pretokenization: Log-Mel Spectrograms
+
+Audio is preprocessed into log-mel spectrograms using Whisper's feature extractor and stored as `float32`.
+Each audio sample is resampled to 16kHz, padded or truncated to 30 seconds, and converted to an 80-channel log-mel spectrogram.
+
+```python
+from transformers import WhisperFeatureExtractor
+import librosa
+
+feature_extractor = WhisperFeatureExtractor.from_pretrained("openai/whisper-tiny")
+
+def pretokenize_audio(audio_paths: list[str]) -> np.ndarray:
+    """Convert audio files to log-mel spectrograms."""
+    log_mels = []
+    for path in audio_paths:
+        audio, sr = librosa.load(path, sr=16000)
+        features = feature_extractor(
+            audio,
+            sampling_rate=16000,
+            return_tensors="np"
+        )
+        log_mels.append(features["input_features"][0])
+    
+    # Stack as float32 (default)
+    log_mel_array = np.stack(log_mels).astype(np.float32)
+    return log_mel_array
+```
+
+The resulting array has shape `(num_samples, 80, 3000)` where 80 is the number of mel frequency bins and 3000 corresponds to 30 seconds of audio at Whisper's hop length.
+
+```python
+# Save pretokenized log-mel features
+np.save("train_log_mel.npy", log_mels, allow_pickle=False)
+
+# Memory-mapped version for large datasets
+memmap = np.memmap(
+    "train_log_mel.dat",
+    dtype=np.float32,
+    mode="w+",
+    shape=(num_samples, 80, 3000)
+)
+memmap[:] = log_mels
+```
+
+## Pushing to Hugging Face
+
+Once pretokenized, the data can be uploaded to Hugging Face Datasets using the `datasets` library.
+Storing precomputed features as `numpy` arrays in the dataset avoids redundant computation during training.
+
+```python
+from datasets import Dataset, Features, Array2D, Array3D, Value
+
+# Create dataset from pretokenized arrays
+dataset = Dataset.from_dict({
+    "input_features": log_mels,      # float32, shape (80, 3000)
+    "labels": token_ids,             # uint16, shape (max_length,)
+    "audio_path": audio_paths,       # optional: keep original paths for reference
+})
+
+# Define features for efficient storage
+features = Features({
+    "input_features": Array3D(dtype="float32", shape=(80, 3000)),
+    "labels": Array2D(dtype="uint16", shape=(max_length,)),
+    "audio_path": Value("string"),
+})
+
+dataset = dataset.cast(features)
+
+# Push to Hugging Face Hub
+dataset.push_to_hub("your-username/troryong-asr-data")
+```
+
+For very large datasets, consider using `Dataset.from_generator` with streaming to avoid loading everything into memory at once:
+
+```python
+def gen():
+    for log_mel, token_id, path in zip(log_mels, token_ids, audio_paths):
+        yield {
+            "input_features": log_mel.astype(np.float32),
+            "labels": token_id.astype(np.uint16),
+            "audio_path": path,
+        }
+
+dataset = Dataset.from_generator(gen, features=features)
+dataset.push_to_hub("your-username/troryong-asr-data")
+```
+
+This preprocessing pipeline reduces training time by eliminating on-the-fly tokenization and feature extraction, while the compact `uint16` and `float32` formats minimize storage and bandwidth costs when pushing to Hugging Face.
+-->
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-bautista2022scene" class="csl-entry" role="listitem">
+Bautista, Darwin, and Rowel Atienza. 2022. <span>“Scene Text Recognition with Permuted Autoregressive Sequence Models.”</span> In <em>European Conference on Computer Vision</em>, 178–96. Springer.
+</div>
+<div id="ref-machavcek2023turning" class="csl-entry" role="listitem">
+Macháček, Dominik, Raj Dabre, and Ondřej Bojar. 2023. <span>“Turning Whisper into Real-Time Transcription System.”</span> In <em>Proceedings of the 13th International Joint Conference on Natural Language Processing and the 3rd Conference of the Asia-Pacific Chapter of the Association for Computational Linguistics: System Demonstrations</em>, 17–24.
+</div>
+<div id="ref-radford2023robust" class="csl-entry" role="listitem">
+Radford, Alec, Jong Wook Kim, Tao Xu, Greg Brockman, Christine McLeavey, and Ilya Sutskever. 2023. <span>“Robust Speech Recognition via Large-Scale Weak Supervision.”</span> In <em>International Conference on Machine Learning</em>, 28492–518. PMLR.
+</div>
+<div id="ref-vaswani2017attention" class="csl-entry" role="listitem">
+Vaswani, Ashish, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. 2017. <span>“Attention Is All You Need.”</span> <em>Advances in Neural Information Processing Systems</em> 30.
+</div>
+<div id="ref-yang2019xlnet" class="csl-entry" role="listitem">
+Yang, Zhilin, Zihang Dai, Yiming Yang, Jaime Carbonell, Russ R Salakhutdinov, and Quoc V Le. 2019. <span>“Xlnet: Generalized Autoregressive Pretraining for Language Understanding.”</span> <em>Advances in Neural Information Processing Systems</em> 32.
+</div>
+</div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{khun2026,
+  author = {Khun, Kimang},
+  title = {TrorYongASR: {Permuted} {AutoRegressive} {Sequence}
+    {Modeling} for {Automatic} {Speech} {Recognition}},
+  date = {2026-05-07},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-khun2026" class="csl-entry quarto-appendix-citeas" role="listitem">
+Khun, Kimang. 2026. <span>“TrorYongASR: Permuted AutoRegressive Sequence
+Modeling for Automatic Speech Recognition.”</span> May 7, 2026.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
