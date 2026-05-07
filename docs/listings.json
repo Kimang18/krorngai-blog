@@ -3,12 +3,12 @@
     "listing": "/index.html",
     "items": [
       "/IntroMultiarmed/index.html",
+      "/TrorYongASR/index.html",
       "/TrorYongOCR/index.html",
       "/WhatIsAnLLMAnyway/index.html",
       "/PARSeqImplement/index.html",
       "/Muon/index.html",
-      "/AITerm/index.html",
-      "/TrorYongASR/index.html"
+      "/AITerm/index.html"
     ]
   }
 ]
