@@ -1,7 +1,9 @@
 ---
 image: logo_black_v2.png
 listing:
-  sort: "data desc"
+  sort:
+    - "data"
+    - "title desc"
 about:
   template: solana
   image-shape: round
