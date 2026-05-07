@@ -123,6 +123,21 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="../styles.css">
+<meta name="citation_title" content="TrorYongASR: Permuted AutoRegressive Sequence Modeling for Automatic Speech Recognition">
+<meta name="citation_author" content="Kimang Khun">
+<meta name="citation_publication_date" content="2026-05-07">
+<meta name="citation_cover_date" content="2026-05-07">
+<meta name="citation_year" content="2026">
+<meta name="citation_online_date" content="2026-05-07">
+<meta name="citation_fulltext_html_url" content="https://kimang18.github.io/krorngai-blog/TrorYongASR/">
+<meta name="citation_language" content="en">
+<meta name="citation_reference" content="citation_title=Attention is all you need;,citation_author=Ashish Vaswani;,citation_author=Noam Shazeer;,citation_author=Niki Parmar;,citation_author=Jakob Uszkoreit;,citation_author=Llion Jones;,citation_author=Aidan N Gomez;,citation_author=Łukasz Kaiser;,citation_author=Illia Polosukhin;,citation_publication_date=2017;,citation_cover_date=2017;,citation_year=2017;,citation_volume=30;,citation_journal_title=Advances in neural information processing systems;">
+<meta name="citation_reference" content="citation_title=Roformer: Enhanced transformer with rotary position embedding;,citation_author=Jianlin Su;,citation_author=Murtadha Ahmed;,citation_author=Yu Lu;,citation_author=Shengfeng Pan;,citation_author=Wen Bo;,citation_author=Yunfeng Liu;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_volume=568;,citation_journal_title=Neurocomputing;,citation_publisher=Elsevier;">
+<meta name="citation_reference" content="citation_title=Xlnet: Generalized autoregressive pretraining for language understanding;,citation_author=Zhilin Yang;,citation_author=Zihang Dai;,citation_author=Yiming Yang;,citation_author=Jaime Carbonell;,citation_author=Russ R Salakhutdinov;,citation_author=Quoc V Le;,citation_publication_date=2019;,citation_cover_date=2019;,citation_year=2019;,citation_volume=32;,citation_journal_title=Advances in neural information processing systems;">
+<meta name="citation_reference" content="citation_title=Generalized autoregressive pretraining for language understanding. arXiv;,citation_author=Z Yang;,citation_author=Z Dai;,citation_author=Y Yang;,citation_author=J Carbonell;,citation_author=R Salakhutdinov;,citation_author=QV Le;,citation_publication_date=2019;,citation_cover_date=2019;,citation_year=2019;,citation_volume=19;,citation_journal_title=Preprint posted online June;">
+<meta name="citation_reference" content="citation_title=Scene text recognition with permuted autoregressive sequence models;,citation_author=Darwin Bautista;,citation_author=Rowel Atienza;,citation_publication_date=2022;,citation_cover_date=2022;,citation_year=2022;,citation_conference_title=European conference on computer vision;,citation_conference=Springer;">
+<meta name="citation_reference" content="citation_title=Turning whisper into real-time transcription system;,citation_author=Dominik Macháček;,citation_author=Raj Dabre;,citation_author=Ondřej Bojar;,citation_publication_date=2023;,citation_cover_date=2023;,citation_year=2023;,citation_conference_title=Proceedings of the 13th international joint conference on natural language processing and the 3rd conference of the asia-pacific chapter of the association for computational linguistics: System demonstrations;">
+<meta name="citation_reference" content="citation_title=Robust speech recognition via large-scale weak supervision;,citation_author=Alec Radford;,citation_author=Jong Wook Kim;,citation_author=Tao Xu;,citation_author=Greg Brockman;,citation_author=Christine McLeavey;,citation_author=Ilya Sutskever;,citation_publication_date=2023;,citation_cover_date=2023;,citation_year=2023;,citation_conference_title=International conference on machine learning;,citation_conference=PMLR;">
 </head>
 
 <body class="nav-fixed quarto-light">
@@ -318,7 +333,6 @@ window.Quarto = {
 <ul>
 <li><strong>Precision</strong>: Proportion of predicted languages that are correct</li>
 <li><strong>Recall</strong>: Proportion of actual language samples correctly identified</li>
-<li><strong>Accuracy</strong>: Proportion of total predictions that are correct</li>
 <li><strong>F1-score</strong>: Harmonic mean of precision and recall</li>
 </ul>
 <p><strong>Results:</strong></p>
@@ -445,7 +459,14 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-<p><strong>Key Observations:</strong> - The tiny model shows strong performance on English (54.33% WER, 42.41% CER, 17% TER) - Performance drops for Khmer (75.88% WER, 54.99% CER, 54% TER) - The small model shows strong performance on English (21.75% WER, 16.58% CER, 8% token error rate) - Performance for Khmer is moderate (50.46% WER, 35.89% CER, 43% token error rate) - The larger model benefits from increased embedding dimension (768 vs 384) and more layers for audio encoder (12 vs 4)</p>
+<p><strong>Key Observations:</strong></p>
+<ul>
+<li>The tiny model shows strong performance on English (54.33% WER, 42.41% CER, 17% TER)</li>
+<li>Performance drops for Khmer (75.88% WER, 54.99% CER, 54% TER)</li>
+<li>The small model shows strong performance on English (21.75% WER, 16.58% CER, 8% TER)</li>
+<li>Performance for Khmer is moderate (50.46% WER, 35.89% CER, 43% TER)</li>
+<li>The larger model benefits from increased embedding dimension (768 vs 384) and more layers for audio encoder (12 vs 4)</li>
+</ul>
 <p><strong>Note:</strong> To compute <code>CER</code> and <code>WER</code>, whitespaces are added between words in Khmer text (Khmer text does not have word boundaries like English text). To do so, <code>khmercut</code> PyPI package is used to tokenize Khmer text into words, and then the words are joined back together with whitespaces.</p>
 <p><strong>WER Comparison with Whisper:</strong></p>
 <table class="table-striped table-hover caption-top table">
@@ -1090,11 +1111,12 @@ Yang, Zhilin, Zihang Dai, Yiming Yang, Jaime Carbonell, Russ R Salakhutdinov, an
   title = {TrorYongASR: {Permuted} {AutoRegressive} {Sequence}
     {Modeling} for {Automatic} {Speech} {Recognition}},
   date = {2026-05-07},
+  url = {https://kimang18.github.io/krorngai-blog/TrorYongASR/},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-khun2026" class="csl-entry quarto-appendix-citeas" role="listitem">
 Khun, Kimang. 2026. <span>“TrorYongASR: Permuted AutoRegressive Sequence
-Modeling for Automatic Speech Recognition.”</span> May 7, 2026.
+Modeling for Automatic Speech Recognition.”</span> May 7, 2026. <a href="https://kimang18.github.io/krorngai-blog/TrorYongASR/">https://kimang18.github.io/krorngai-blog/TrorYongASR/</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
