@@ -50,7 +50,8 @@ Your generosity acts as a huge encouragement and helps ensure that I can continu
 
 ## PyPI Packages
 
-- TrorYongOCR: Optical Character Recognition Models with my design of model architecture (`pip install tror-yong-ocr` or more info [here](https://pypi.org/project/tror-yong-ocr/)) 
+- TrorYongASR: Automatic Speech Recognition Models with my own model architecture design (`pip install tror-yong-asr` or more info [here](https://pypi.org/project/tror-yong-asr/)) 
+- TrorYongOCR: Optical Character Recognition Models with my own model architecture design (`pip install tror-yong-ocr` or more info [here](https://pypi.org/project/tror-yong-ocr/)) 
 - NeoWhisper: Re-implementation of Whisper with the most recent attention technologies (`pip install neo-whisper` or more info [here](https://pypi.org/project/neo-whisper/))
 - TrorYongGPT: Small Language Models with the most recent attention technologies implemented (`pip install tror-yong-lm` or more info [here](https://pypi.org/project/tror-yong-lm/))
 
