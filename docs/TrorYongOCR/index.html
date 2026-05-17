@@ -6,11 +6,11 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="KrorngAI">
+<meta name="author" content="Kimang KHUN">
 <meta name="dcterms.date" content="2026-02-19">
-<meta name="description" content="Design a Tiny OCR Model for Khmer text">
+<meta name="description" content="Meet Your Tiny OCR Model">
 
-<title>TrorYong OCR: Meet Your Tiny OCR Model – ក្រង AI</title>
+<title>TrorYongOCR: Encoder-Decoder Model for Scene Text Recognition – ក្រង AI</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -158,6 +158,18 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="../styles.css">
+<meta name="citation_title" content="TrorYongOCR: Encoder-Decoder Model for Scene Text Recognition">
+<meta name="citation_author" content="Kimang KHUN">
+<meta name="citation_publication_date" content="2026-02-19">
+<meta name="citation_cover_date" content="2026-02-19">
+<meta name="citation_year" content="2026">
+<meta name="citation_online_date" content="2026-02-19">
+<meta name="citation_fulltext_html_url" content="https://kimang18.github.io/krorngai-blog/TrorYongOCR/">
+<meta name="citation_language" content="en">
+<meta name="citation_reference" content="citation_title=Exclusive self attention;,citation_author=Shuangfei Zhai;,citation_publication_date=2026;,citation_cover_date=2026;,citation_year=2026;,citation_journal_title=arXiv preprint arXiv:2603.09078;">
+<meta name="citation_reference" content="citation_title=Dtrocr: Decoder-only transformer for optical character recognition;,citation_author=Masato Fujitake;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_conference_title=Proceedings of the IEEE/CVF winter conference on applications of computer vision;">
+<meta name="citation_reference" content="citation_title=Xlnet: Generalized autoregressive pretraining for language understanding;,citation_author=Zhilin Yang;,citation_author=Zihang Dai;,citation_author=Yiming Yang;,citation_author=Jaime Carbonell;,citation_author=Russ R Salakhutdinov;,citation_author=Quoc V Le;,citation_publication_date=2019;,citation_cover_date=2019;,citation_year=2019;,citation_volume=32;,citation_journal_title=Advances in neural information processing systems;">
+<meta name="citation_reference" content="citation_title=Scene text recognition with permuted autoregressive sequence models;,citation_author=Darwin Bautista;,citation_author=Rowel Atienza;,citation_publication_date=2022;,citation_cover_date=2022;,citation_year=2022;,citation_conference_title=European conference on computer vision;,citation_conference=Springer;">
 </head>
 
 <body class="nav-fixed quarto-light">
@@ -206,14 +218,12 @@ window.Quarto = {
   <li><a href="#compared-to-dtrocr" id="toc-compared-to-dtrocr" class="nav-link" data-scroll-target="#compared-to-dtrocr">Compared to DTrOCR</a></li>
   </ul></li>
   <li><a href="#fine-tune-tutorial" id="toc-fine-tune-tutorial" class="nav-link" data-scroll-target="#fine-tune-tutorial">Fine-tune Tutorial</a></li>
-  <li><a href="#result" id="toc-result" class="nav-link" data-scroll-target="#result">Result</a></li>
-  <li><a href="#deployment" id="toc-deployment" class="nav-link" data-scroll-target="#deployment">Deployment</a></li>
   <li><a href="#implementation" id="toc-implementation" class="nav-link" data-scroll-target="#implementation">Implementation</a></li>
   <li><a href="#training-detail" id="toc-training-detail" class="nav-link" data-scroll-target="#training-detail">Training Detail</a>
   <ul class="collapse">
+  <li><a href="#datasets" id="toc-datasets" class="nav-link" data-scroll-target="#datasets">Datasets</a></li>
   <li><a href="#hyperparameters" id="toc-hyperparameters" class="nav-link" data-scroll-target="#hyperparameters">Hyperparameters</a></li>
   <li><a href="#weight-initialization" id="toc-weight-initialization" class="nav-link" data-scroll-target="#weight-initialization">Weight Initialization</a></li>
-  <li><a href="#datasets" id="toc-datasets" class="nav-link" data-scroll-target="#datasets">Datasets</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -224,7 +234,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">TrorYong OCR: Meet Your Tiny OCR Model</h1>
+<h1 class="title">TrorYongOCR: Encoder-Decoder Model for Scene Text Recognition</h1>
   <div class="quarto-categories">
     <div class="quarto-category">Science</div>
     <div class="quarto-category">Technology</div>
@@ -233,7 +243,7 @@ window.Quarto = {
 
 <div>
   <div class="description">
-    Design a Tiny OCR Model for Khmer text
+    Meet Your Tiny OCR Model
   </div>
 </div>
 
@@ -243,7 +253,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>KrorngAI </p>
+             <p>Kimang KHUN </p>
           </div>
   </div>
     
@@ -254,6 +264,12 @@ window.Quarto = {
     </div>
   </div>
   
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">May 17, 2026</p>
+    </div>
+  </div>
     
   </div>
   
@@ -264,34 +280,34 @@ window.Quarto = {
 
 <section id="abstract" class="level1">
 <h1>Abstract</h1>
-<p>Inspired by PARSeq <span class="citation" data-cites="bautista2022scene">(<a href="#ref-bautista2022scene" role="doc-biblioref">Bautista and Atienza 2022</a>)</span> and DTrOCR <span class="citation" data-cites="fujitake2024dtrocr">(<a href="#ref-fujitake2024dtrocr" role="doc-biblioref">Fujitake 2024</a>)</span>, I design a tiny OCR model called TrorYongOCR for Scene Text Recognition task. A pretrained version is deployed on Huggingface Space <a href="https://huggingface.co/spaces/KrorngAI/KhmerOCRWithTrorYongOCR">here</a>.</p>
+<p>TrorYongOCR is a tiny encoder-decoder model for Scene Text Recognition task. Its image encoder projects image into character embedding space allowing the text decoder to process the image encoding as a prefill prompt and generate character tokens in autoregressive manner. Current pre-trained weight supports 2 languages: Khmer and English. The model is deployed on Huggingface Space <a href="https://krorngai-troryongocr-demo.hf.space">here</a> for demonstration.</p>
 <section id="methodology-use-image-encoding-as-a-prefilll-prompt" class="level2">
 <h2 class="anchored" data-anchor-id="methodology-use-image-encoding-as-a-prefilll-prompt">Methodology: Use Image Encoding as a Prefilll Prompt</h2>
-<p>Inspired by PARSeq and DTrOCR, I design TrorYongOCR as the following: given <span class="math inline">\(L\)</span> transformer blocks</p>
+<p>TrorYongOCR is designed as the following: given <span class="math inline">\(L\)</span> transformer blocks</p>
 <ul>
-<li><span class="math inline">\(L-1\)</span> are encoding blocks to encode a given image</li>
-<li>the last block is a decoding block without cross-attention mechanism</li>
-<li>for the decoding block,
-<ul>
-<li>the latent state of an image (the output of encoding layers) is concatenated with the input character embedding (token embedding including bos token plus position embedding) to create context vector, <em>i.e.</em> key and value vectors (think of it like a prefill prompt)</li>
-<li>and the input character embedding (token embedding plus position embedding) is used as query vector.</li>
-</ul></li>
+<li><span class="math inline">\(L-1\)</span> are encoding blocks that encode a given image</li>
+<li>the last block is a single decoding block without cross-attention mechanism</li>
+<li>each transformer is implemented with exclusive self-attention <span class="citation" data-cites="zhai2026exclusive">(<a href="#ref-zhai2026exclusive" role="doc-biblioref">Zhai 2026</a>)</span> style and SwiGLU in MLP</li>
 </ul>
-<p>New technologies in Attention mechanism such as Rotary Positional Embedding (RoPE), Sigmoid Linear Unit (SiLU), and Gated Linear Unit (GLU) in MLP of Transformer block are implemented in TrorYongOCR.</p>
+<p>For the single decoding block,</p>
+<ul>
+<li>the latent state of an image (the output of encoding blocks) is concatenated with the input character embedding (token embedding including bos token) to create context vector, <em>i.e.</em> key and value vectors (think of it like a prefill prompt)</li>
+<li>the query vector is simply the input character embedding (token embedding).</li>
+</ul>
 <p>TrorYongOCR architecture overview can be found in <a href="#fig-architect" class="quarto-xref">Figure&nbsp;1</a>.</p>
 <div id="fig-architect" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-architect-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="https://raw.githubusercontent.com/Kimang18/KrorngAI/refs/heads/main/tror-yong-ocr/TrorYongOCR.drawio.png" class="img-fluid figure-img">
+<img src="https://huggingface.co/Kimang18/TrorYongOCR/resolve/main/figures/architecture.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-architect-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: TrorYongOCR architecture overview. The input image is transformed into patch embedding. Image embedding is obtained by additioning patch embedding and position embedding. The image embedding is passed through <span class="math inline">\(L-1\)</span> encoder blocks to generate image encoding (latent state). The image encoding is concatenated with character embedding (i.e.&nbsp;token embedding plus position embedding) before undergoing causal self-attention mechanism in the single decoder block to generate visio-lingual encoding (the ultimate latent state). Finally, the linear layer projects the visio-lingual encoding into logit over token space.
+Figure&nbsp;1: TrorYongOCR architecture overview. The input image is transformed into patch embedding. The embedding is passed through <span class="math inline">\(L-1\)</span> encoder blocks to generate image encoding (latent state). The image encoding is concatenated with character embedding (i.e.&nbsp;token embedding) before undergoing causal self-attention mechanism in the single decoder block to generate the ultimate latent state. Finally, the linear layer projects the normalized latent state into logits over character set.
 </figcaption>
 </figure>
 </div>
 <section id="model-configuration" class="level3">
 <h3 class="anchored" data-anchor-id="model-configuration">Model Configuration</h3>
-<p>The choice of model configuration can be found below where the image input dimension is <span class="math inline">\((H, W) = (32, 128)\)</span> where <span class="math inline">\(H\)</span> and <span class="math inline">\(W\)</span> are height and width of image respectively, patch size is <span class="math inline">\((4, 8)\)</span>, block size or maximum number of input tokens is <span class="math inline">\(192\)</span>. Transformer configuration is the following: there are <span class="math inline">\(4\)</span> blocks, each has embedding dimension <span class="math inline">\(d_{model}=384\)</span> and <span class="math inline">\(h=6\)</span> heads. In particular, encoding blocks (block <span class="math inline">\(1\)</span> to <span class="math inline">\(3\)</span>) have feedforward dimension <span class="math inline">\(d_{feedforward}=2*d_{model}=768\)</span> and the decoding block has <span class="math inline">\(d_{feedforward}=4*d_{model}=1546\)</span> (see <a href="#tbl-transformer" class="quarto-xref">Table&nbsp;1</a>).</p>
+<p>The choice of model configuration can be found below where the image input dimension is <span class="math inline">\((H, W) = (32, 128)\)</span> where <span class="math inline">\(H\)</span> and <span class="math inline">\(W\)</span> are height and width of image respectively, patch size is <span class="math inline">\((4, 8)\)</span>, block size or maximum number of input tokens is <span class="math inline">\(192\)</span>. Transformer configuration is the following: there are <span class="math inline">\(4\)</span> blocks, each has embedding dimension <span class="math inline">\(d_{model}=384\)</span> and <span class="math inline">\(h=6\)</span> heads. In particular, encoding blocks (block <span class="math inline">\(1\)</span> to <span class="math inline">\(3\)</span>) have MLP dimension <span class="math inline">\(d_{MLP}=2*d_{model}=768\)</span> and the decoding block has <span class="math inline">\(d_{MLP}=4*d_{model}=1546\)</span> (see <a href="#tbl-transformer" class="quarto-xref">Table&nbsp;1</a>).</p>
 <div id="tbl-transformer" class="striped hover quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-transformer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -304,7 +320,7 @@ Table&nbsp;1: Configuration of Transformer Blocks of TrorYongOCR
 <th>Layer</th>
 <th><span class="math inline">\(d_{model}\)</span></th>
 <th><span class="math inline">\(h\)</span></th>
-<th><span class="math inline">\(d_{feedforward}\)</span></th>
+<th><span class="math inline">\(d_{MLP}\)</span></th>
 <th style="text-align: right;">Role</th>
 </tr>
 </thead>
@@ -342,164 +358,133 @@ Table&nbsp;1: Configuration of Transformer Blocks of TrorYongOCR
 </div>
 </figure>
 </div>
-<p>The python code for the configuration is given below.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> TrorYongConfig(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    img_size<span class="op">=</span>(<span class="dv">32</span>, <span class="dv">128</span>),</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    patch_size<span class="op">=</span>(<span class="dv">4</span>, <span class="dv">8</span>),</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    n_channel<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    vocab_size<span class="op">=</span><span class="bu">len</span>(tokenizer),</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    block_size<span class="op">=</span><span class="dv">192</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    n_layer<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    n_head<span class="op">=</span><span class="dv">6</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    n_embed<span class="op">=</span><span class="dv">384</span>,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    dropout<span class="op">=</span><span class="fl">0.1</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    bias<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<!--
+The python code for the configuration is given below.
+```python
+config = TrorYongConfig(
+    img_size=(32, 128),
+    patch_size=(4, 8),
+    n_channel=3,
+    vocab_size=len(tokenizer),
+    block_size=192,
+    n_layer=4,
+    n_head=6,
+    n_embed=384,
+    dropout=0.1,
+    bias=True,
+)
+```
+-->
 </section>
 <section id="compared-to-parseq" class="level3">
 <h3 class="anchored" data-anchor-id="compared-to-parseq">Compared to PARSeq</h3>
-<p>For PARSeq model which is an encoder-decoder architecture, text decoder uses position embedding as query vector, character embedding (token embedding plus position embedding) as context vector, and the latent state from image encoder as memory for the cross-attention mechanism (see Figure 3 of <span class="citation" data-cites="bautista2022scene">(<a href="#ref-bautista2022scene" role="doc-biblioref">Bautista and Atienza 2022</a>)</span>).</p>
+<p>PARSeq model is an encoder-decoder model that implements Permuted Language Modeling <span class="citation" data-cites="yang2019xlnet">(<a href="#ref-yang2019xlnet" role="doc-biblioref">Yang et al. 2019</a>)</span>: the text decoder uses position embedding as query vector, character embedding (token embedding plus position embedding) as context vector, and the latent state from image encoder as memory for the cross-attention mechanism (see Figure 3 of <span class="citation" data-cites="bautista2022scene">(<a href="#ref-bautista2022scene" role="doc-biblioref">Bautista and Atienza 2022</a>)</span>). PARSeq’s encoder aims to extract image features that help the decoder’s character-image alignment. This is significantly different from TrorYongOCR’s encoder who tries to project image patch into character embedding space.</p>
 </section>
 <section id="compared-to-dtrocr" class="level3">
 <h3 class="anchored" data-anchor-id="compared-to-dtrocr">Compared to DTrOCR</h3>
-<p>For DTrOCR which is a decoder-only architecture, the image embedding (patch embedding plus position embedding) is concatenated with input character embedding (a [SEP] token is added at the beginning of input character embedding to indicate sequence separation. [SEP] token is equivalent to <code>bos</code> token in TrorYongOCR), and causal self-attention mechanism is applied to the concatenation from layer to layer to generate text autoregressively (see Figure 2 of <span class="citation" data-cites="fujitake2024dtrocr">(<a href="#ref-fujitake2024dtrocr" role="doc-biblioref">Fujitake 2024</a>)</span>).</p>
+<p>DTrOCR is a decoder-only model. The image embedding (<em>i.e.,</em> patch embedding plus position embedding) is concatenated with the input character embedding to form query vector. [SEP] token is added at the beginning of input character embedding to indicate sequence separation ([SEP] token is equivalent to <code>bos</code> token in TrorYongOCR). Causal self-attention mechanism is then applied to the query vector from layer to layer to generate characters autoregressively (see Figure 2 of <span class="citation" data-cites="fujitake2024dtrocr">(<a href="#ref-fujitake2024dtrocr" role="doc-biblioref">Fujitake 2024</a>)</span>). In contrast, TrorYongOCR concatenates input character embedding with image encoding to form query vector for the single decoder block.</p>
 </section>
 </section>
 <section id="fine-tune-tutorial" class="level2">
 <h2 class="anchored" data-anchor-id="fine-tune-tutorial">Fine-tune Tutorial</h2>
-<p>You can find my video tutorial on fine-tuning TrorYongOCR in the video below.</p>
+<p>You can find a notebook for fine-tuning TrorYongOCR here: <a href="https://colab.research.google.com/github/Kimang18/rag-demo-with-mlx/blob/main/FinetuneTrorYongOCR.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid" alt="Open in Colab"></a></p>
+<p>If you understand Khmer, you can watch my explanation on fine-tuning TrorYongOCR in the video below.</p>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/3W8P0mByFBY?si=TbGdt_hlDtEb_LNs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="">
 </iframe>
-</section>
-<section id="result" class="level2">
-<h2 class="anchored" data-anchor-id="result">Result</h2>
-<p>I used different screenshots to test the trained model. For characters with fonts present in the training dataset, the trained model is able to recognize fairly well. However, for any characters with fonts absent from the training dataset, the trained model perform poorly. For instance, character in <code>Khmer Muol</code> font can completely break the trained model regardless of image aspect ratio.</p>
-</section>
-<section id="deployment" class="level2">
-<h2 class="anchored" data-anchor-id="deployment">Deployment</h2>
-<p>I deploy the pretrained model (<code>best-model-90epoch.pt</code>) on KrorngAI space <a href="https://huggingface.co/spaces/KrorngAI/KhmerOCRWithTrorYongOCR">here</a>.</p>
+<!--
+## Result
+
+I used different screenshots to test the trained model.
+For characters with fonts present in the training dataset, the trained model is able to recognize fairly well.
+However, for any characters with fonts absent from the training dataset, the trained model perform poorly.
+For instance, character in `Khmer Muol` font can completely break the trained model regardless of image aspect ratio.
+-->
 </section>
 <section id="implementation" class="level2">
 <h2 class="anchored" data-anchor-id="implementation">Implementation</h2>
 <p>TrorYongOCR is implemented as a <code>PyPI</code> package and can be installed via</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install tror-yong-ocr</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install tror-yong-ocr</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>More detail is given <a href="https://pypi.org/project/tror-yong-ocr/">here</a>.</p>
 </section>
 <section id="training-detail" class="level2">
 <h2 class="anchored" data-anchor-id="training-detail">Training Detail</h2>
-<p>The public pretrained weight of TrorYongOCR can be found <a href="https://huggingface.co/KrorngAI/TrorYongOCR">here</a>. It is obtained by training on <a href="https://huggingface.co/datasets/seanghay/khmer-hanuman-100k"><code>seanghay/khmer-hanuman-100k</code></a> and <a href="https://huggingface.co/datasets/SoyVitou/KhmerSynthetic1M"><code>SoyVitou/KhmerSynthetic1M</code></a> datasets. Due to no benchmark datasets for Khmer language, the metric I can share here is that my model achieves a training loss and a validation loss of around <code>0.2</code>.</p>
-<section id="hyperparameters" class="level3">
-<h3 class="anchored" data-anchor-id="hyperparameters">Hyperparameters</h3>
-<p>The hyperparameters regarding the learning rate is given in <a href="#tbl-training" class="quarto-xref">Table&nbsp;2</a>. For optimizer, I used ‘Adaptive Momentum with Weight Decay’ whose hyperparameters can be found in <a href="#tbl-adamw" class="quarto-xref">Table&nbsp;3</a>.</p>
-<div id="tbl-training" class="striped hover quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-training-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;2: Hyperparameters for learning rate. I used gradient accumulation method to save GPU memory. The learning rate is scheduled with a warmup phase of 10% of total steps when it increases to <span class="math inline">\(lr_{max}\)</span> and a cosine annealing phase when it decreases to <span class="math inline">\(lr_{min}\)</span>.
-</figcaption>
-<div aria-describedby="tbl-training-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<table class="table-striped table-hover caption-top table">
-<colgroup>
-<col style="width: 29%">
-<col style="width: 17%">
-<col style="width: 11%">
-<col style="width: 11%">
-<col style="width: 11%">
-<col style="width: 17%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Batch size</th>
-<th>Grad Accum Step</th>
-<th><span class="math inline">\(lr_{max}\)</span></th>
-<th><span class="math inline">\(lr_{min}\)</span></th>
-<th>Schedule</th>
-<th style="text-align: right;">Warmup</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>256</td>
-<td>2</td>
-<td><span class="math inline">\(7\times 10^{-3}\)</span></td>
-<td><span class="math inline">\(3.5\times 10^{-4}\)</span></td>
-<td>cosine</td>
-<td style="text-align: right;">10%</td>
-</tr>
-</tbody>
-</table>
-</div>
-</figure>
-</div>
-<div id="tbl-adamw" class="striped hover quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-adamw-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;3: Hyperparameters for Adaptive Momentum with Weight Decay. I chose betas <span class="math inline">\((\beta_1=0.9, \beta_2=0.999)\)</span> as they are the standard value. For <span class="math inline">\(weight\ decay=0.001\)</span>, the choice is due to the fact that TrorYongOCR is a tiny model (with <span class="math inline">\(7\)</span> millions parameters) and it is best to apply less regularization on tiny size model. Finally, the value of <span class="math inline">\(\varepsilon=10^{-8}\)</span> is just a default choice in AdamW of PyTorch.
-</figcaption>
-<div aria-describedby="tbl-adamw-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<table class="table-striped table-hover caption-top table">
-<thead>
-<tr class="header">
-<th><span class="math inline">\(\beta_1\)</span></th>
-<th><span class="math inline">\(\beta_2\)</span></th>
-<th>weight decay</th>
-<th style="text-align: right;"><span class="math inline">\(\varepsilon\)</span></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="math inline">\(0.9\)</span></td>
-<td><span class="math inline">\(0.999\)</span></td>
-<td><span class="math inline">\(0.001\)</span></td>
-<td style="text-align: right;"><span class="math inline">\(10^{-8}\)</span></td>
-</tr>
-</tbody>
-</table>
-</div>
-</figure>
-</div>
-</section>
-<section id="weight-initialization" class="level3">
-<h3 class="anchored" data-anchor-id="weight-initialization">Weight Initialization</h3>
-<p>We initialize weights as what SOTA models reguarly do. The code to initialize the weight is given below.</p>
-<p>Exceptionally, for position embedding used in the decoding block, I initialized it with <span class="math inline">\(std=1.0\)</span>.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> init_weights(<span class="va">self</span>, module: nn.Module, name: <span class="bu">str</span> <span class="op">=</span> <span class="st">''</span>, exclude: Sequence[<span class="bu">str</span>] <span class="op">=</span> (<span class="st">''</span>)):</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Initialize the weights using the typical initialization schemes used in SOTA models."""</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">any</span>(<span class="bu">map</span>(name.startswith, exclude)):</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(module, nn.Linear):</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        nn.init.trunc_normal_(module.weight, std<span class="op">=</span><span class="fl">0.02</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> module.bias <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>            nn.init.zeros_(module.bias)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> <span class="bu">isinstance</span>(module, nn.Embedding):</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        nn.init.trunc_normal_(module.weight, std<span class="op">=</span><span class="fl">0.02</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> module.padding_idx <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>            module.weight.data[module.padding_idx].zero_()</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> <span class="bu">isinstance</span>(module, nn.Conv2d):</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        nn.init.kaiming_normal_(module.weight)</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> module.bias <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>            nn.init.zeros_(module.bias)</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> <span class="bu">isinstance</span>(module, (nn.LayerNorm, nn.BatchNorm2d, nn.GroupNorm)):</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>        nn.init.ones_(module.weight)</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        nn.init.zeros_(module.bias)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
+<p>The pre-trained weight of TrorYongOCR can be found <a href="https://huggingface.co/KrorngAI/TrorYongOCR">here</a>. It is obtained by training on <a href="https://huggingface.co/datasets/seanghay/khmer-hanuman-100k"><code>seanghay/khmer-hanuman-100k</code></a> and <a href="https://huggingface.co/datasets/SoyVitou/KhmerSynthetic1M"><code>SoyVitou/KhmerSynthetic1M</code></a> datasets. Due to no benchmark datasets for Khmer language, the metric I can share here is that TrorYongOCR achieves <code>6.8%</code> character error rate (CER) on my test dataset containing <code>33613</code> samples. This test dataset is a split of both datasets mentioned earlier.</p>
 <section id="datasets" class="level3">
 <h3 class="anchored" data-anchor-id="datasets">Datasets</h3>
-<p>Both datasets have an aspect ratio, <span class="math inline">\(\frac{W}{H}\)</span>, varies from <span class="math inline">\(1\)</span> to <span class="math inline">\(15\)</span>. Since the ratio of my input image dimension is <span class="math inline">\(\frac{128}{32}=4\)</span>, the images with extreme ratio will be transformed radically. Consequently, the characters inside the images are transformed too excessively which itself impacts the features of characters inside the image. This makes it hard for model to capture meaningful features in the transformed images.</p>
-<section id="khmer-hanuman-100k" class="level4">
-<h4 class="anchored" data-anchor-id="khmer-hanuman-100k">khmer-hanuman-100k</h4>
-<p>This dataset by <code>YatSeanghay</code> contains images with a variety of background colors and character colors. I split this dataset by 9:1 where 90% is used for training set and 10% is used for validation set. I trained TrorYongOCR on this dataset over 80 epochs. This allows me to get a relatively good model.</p>
-</section>
+<p>Both datasets have an aspect ratio, <span class="math inline">\(\frac{W}{H}\)</span>, varies from <span class="math inline">\(1\)</span> to <span class="math inline">\(15\)</span>. Since the ratio of my input image dimension is <span class="math inline">\(\frac{128}{32}=4\)</span>, the images of both datasets with extreme ratio will be transformed radically and the characters inside the images are transformed too excessively. This severely impacts the character features and makes it hard for model to capture meaningful features in the transformed images. To resolve this, all images with an aspect ratio larger than 5 are filtered out. This leaves me with combined dataset of <code>336135</code> samples.</p>
 <section id="khmersynthetic1m" class="level4">
 <h4 class="anchored" data-anchor-id="khmersynthetic1m">KhmerSynthetic1M</h4>
-<p><code>KhmerSynthetic1M</code> is a dataset by <code>SoyVitou</code>. This dataset contains images in gray monochromatic color palette (black, white, gray, etc.,). The distribution of the number of tokens, <em>i.e.</em> frequency of each number of tokens, is fairly uniform. In particular, the maximum number of tokens is around <span class="math inline">\(120\)</span>. This implies that there are images with aspect ratio largely higher than <span class="math inline">\(4\)</span>. So, I filtered out any images with a ratio larger than <span class="math inline">\(5\)</span> and used the filtered dataset to train TrorYongOCR. Similarly, <span class="math inline">\(90\%\)</span> is used for training and 10% for validation. The training carried over <span class="math inline">\(20\)</span> epochs, and the model achieves a <code>cer</code> of <code>11.5%</code> on the validation</p>
+<p><code>KhmerSynthetic1M</code> is a dataset by <code>Mr. Soy Vitou</code>. This dataset contains images in gray monochromatic color palette (black, white, gray, etc.,). The distribution of the number of tokens, <em>i.e.</em> frequency of each number of tokens, is fairly uniform. In particular, the maximum number of tokens is around <span class="math inline">\(120\)</span>. This implies that there are images with aspect ratio largely higher than <span class="math inline">\(4\)</span>.</p>
+</section>
+<section id="khmer-hanuman-100k" class="level4">
+<h4 class="anchored" data-anchor-id="khmer-hanuman-100k">khmer-hanuman-100k</h4>
+<p>This dataset by <code>Mr. Yat Seanghay</code> contains images with a variety of background colors and character colors.</p>
 </section>
 <section id="combined-dataset" class="level4">
 <h4 class="anchored" data-anchor-id="combined-dataset">Combined dataset</h4>
-<p>Finally, I combined <code>hanuman-100k</code> and <code>KhmerSynthetic1M</code> and trained the model for <span class="math inline">\(1\)</span> more epoch. (Note that I filter out any images with an aspect ratio larger than 5). All of my the checkpoints can be found <a href="https://huggingface.co/KrorngAI/TrorYongOCR">here</a>.</p>
-
-
-
+<p>The final dataset has <code>336135</code> samples, <code>33613</code> samples are for test set, 3025 samples are for validation set, and the rest is for train set. TrorYongOCR is trained for <code>20</code> epochs in float16 mixed precision using <code>LightningAI</code> package.</p>
 </section>
+</section>
+<section id="hyperparameters" class="level3">
+<h3 class="anchored" data-anchor-id="hyperparameters">Hyperparameters</h3>
+<p>The hyperparameters regarding the learning rate is given in <a href="#tbl-training" class="quarto-xref">Table&nbsp;2</a>.</p>
+<div id="tbl-training" class="striped hover quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-training-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Hyperparameters for my training. The learning rate is scheduled with a warmup phase of 1% of total steps when it increases to <span class="math inline">\(lr_{max}\)</span> and a cosine annealing phase when it decreases to <span class="math inline">\(lr_{min}=10^{-5}\)</span>.
+</figcaption>
+<div aria-describedby="tbl-training-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table-striped table-hover caption-top table">
+<thead>
+<tr class="header">
+<th>Batch size</th>
+<th>Epochs</th>
+<th>LR Schedule</th>
+<th>Warmup</th>
+<th style="text-align: right;"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(1024\)</span></td>
+<td><span class="math inline">\(20\)</span></td>
+<td>linear <span class="math inline">\(\rightarrow\)</span> cosine</td>
+<td>1%</td>
+<td style="text-align: right;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>TrorYongOCR is trained using a hybrid MuonAdam optimizer.</p>
+</section>
+<section id="weight-initialization" class="level3">
+<h3 class="anchored" data-anchor-id="weight-initialization">Weight Initialization</h3>
+<p>I initialized weights as what SOTA models reguarly do. The code to initialize the weight is given below.</p>
+<p>Exceptionally, for position embedding used in the decoding block, I initialized it with <span class="math inline">\(std=1.0\)</span>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> init_weights(<span class="va">self</span>, module: nn.Module, name: <span class="bu">str</span> <span class="op">=</span> <span class="st">''</span>, exclude: Sequence[<span class="bu">str</span>] <span class="op">=</span> (<span class="st">''</span>)):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Initialize the weights using the typical initialization schemes used in SOTA models."""</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">any</span>(<span class="bu">map</span>(name.startswith, exclude)):</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(module, nn.Linear):</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        nn.init.trunc_normal_(module.weight, std<span class="op">=</span><span class="fl">0.02</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> module.bias <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            nn.init.zeros_(module.bias)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> <span class="bu">isinstance</span>(module, nn.Embedding):</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        nn.init.trunc_normal_(module.weight, std<span class="op">=</span><span class="fl">0.02</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> module.padding_idx <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>            module.weight.data[module.padding_idx].zero_()</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> <span class="bu">isinstance</span>(module, nn.Conv2d):</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        nn.init.kaiming_normal_(module.weight)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> module.bias <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>            nn.init.zeros_(module.bias)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> <span class="bu">isinstance</span>(module, (nn.LayerNorm, nn.BatchNorm2d, nn.GroupNorm)):</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        nn.init.ones_(module.weight)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        nn.init.zeros_(module.bias)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+
+
+
 </section>
 </section>
 </section>
@@ -511,7 +496,24 @@ Bautista, Darwin, and Rowel Atienza. 2022. <span>“Scene Text Recognition with 
 <div id="ref-fujitake2024dtrocr" class="csl-entry" role="listitem">
 Fujitake, Masato. 2024. <span>“Dtrocr: Decoder-Only Transformer for Optical Character Recognition.”</span> In <em>Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision</em>, 8025–35.
 </div>
-</div></section></div></main> <!-- /main -->
+<div id="ref-yang2019xlnet" class="csl-entry" role="listitem">
+Yang, Zhilin, Zihang Dai, Yiming Yang, Jaime Carbonell, Russ R Salakhutdinov, and Quoc V Le. 2019. <span>“Xlnet: Generalized Autoregressive Pretraining for Language Understanding.”</span> <em>Advances in Neural Information Processing Systems</em> 32.
+</div>
+<div id="ref-zhai2026exclusive" class="csl-entry" role="listitem">
+Zhai, Shuangfei. 2026. <span>“Exclusive Self Attention.”</span> <em>arXiv Preprint arXiv:2603.09078</em>.
+</div>
+</div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{khun2026,
+  author = {KHUN, Kimang},
+  title = {TrorYongOCR: {Encoder-Decoder} {Model} for {Scene} {Text}
+    {Recognition}},
+  date = {2026-02-19},
+  url = {https://kimang18.github.io/krorngai-blog/TrorYongOCR/},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-khun2026" class="csl-entry quarto-appendix-citeas" role="listitem">
+KHUN, Kimang. 2026. <span>“TrorYongOCR: Encoder-Decoder Model for Scene
+Text Recognition.”</span> February 19, 2026. <a href="https://kimang18.github.io/krorngai-blog/TrorYongOCR/">https://kimang18.github.io/krorngai-blog/TrorYongOCR/</a>.
+</div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
