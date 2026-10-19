@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Kimang Khun">
+<meta name="dcterms.date" content="2027-12-08">
+<meta name="description" content="Lightweight Permuted Language Modeling for Automatic Speech Recognition.">
+
+<title>TrorYongASR2: Permuted Language Modeling with Monotonic Alignment, Gated Attention, and Normalization-free Design – ក្រង AI</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-highlight-style-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-d16dd9f3961666e8bf8664b0512d6850.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+<meta name="citation_title" content="TrorYongASR2: Permuted Language Modeling with Monotonic Alignment, Gated Attention, and Normalization-free Design">
+<meta name="citation_author" content="Kimang Khun">
+<meta name="citation_publication_date" content="2027-12-08">
+<meta name="citation_cover_date" content="2027-12-08">
+<meta name="citation_year" content="2027">
+<meta name="citation_online_date" content="2027-12-08">
+<meta name="citation_fulltext_html_url" content="https://kimang18.github.io/krorngai-blog/TrorYongASR2/">
+<meta name="citation_language" content="en">
+<meta name="citation_reference" content="citation_title=Stronger normalization-free transformers;,citation_author=Mingzhi Chen;,citation_author=Taiming Lu;,citation_author=Jiachen Zhu;,citation_author=Mingjie Sun;,citation_author=Zhuang Liu;,citation_publication_date=2026;,citation_cover_date=2026;,citation_year=2026;,citation_conference_title=Proceedings of the IEEE/CVF conference on computer vision and pattern recognition;">
+<meta name="citation_reference" content="citation_title=Round and round we go! What makes rotary positional encodings useful?;,citation_author=Federico Barbero;,citation_author=Alex Vitvitskyi;,citation_author=Christos Perivolaropoulos;,citation_author=Razvan Pascanu;,citation_author=Petar Veličković;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_journal_title=arXiv preprint arXiv:2410.06205;">
+<meta name="citation_reference" content="citation_title=Gated attention for large language models: Non-linearity, sparsity, and attention-sink-free;,citation_author=Zihan Qiu;,citation_author=Zekun Wang;,citation_author=Bo Zheng;,citation_author=Zeyu Huang;,citation_author=Kaiyue Wen;,citation_author=Songlin Yang;,citation_author=Rui Men;,citation_author=Le Yu;,citation_author=Fei Huang;,citation_author=Suozhi Huang;,citation_author=others;,citation_publication_date=2026;,citation_cover_date=2026;,citation_year=2026;,citation_volume=38;,citation_journal_title=Advances in Neural Information Processing Systems;">
+<meta name="citation_reference" content="citation_title=Length-aware rotary position embedding for text-speech alignment;,citation_author=Hyeongju Kim;,citation_author=Juheon Lee;,citation_author=Jinhyeok Yang;,citation_author=Jacob Morton;,citation_publication_date=2026;,citation_cover_date=2026;,citation_year=2026;,citation_conference_title=ICASSP 2026-2026 IEEE international conference on acoustics, speech and signal processing (ICASSP);,citation_conference=IEEE;">
+<meta name="citation_reference" content="citation_title=TrorYongASR: Permuted AutoRegressive Sequence Modeling for Automatic Speech Recognition;,citation_author=Kimang Khun;,citation_publication_date=2026-05-07;,citation_cover_date=2026-05-07;,citation_year=2026;,citation_fulltext_html_url=https://kimang18.github.io/krorngai-blog/TrorYongASR/;,citation_language=en;">
+<meta name="citation_reference" content="citation_title=Attention is all you need;,citation_author=Ashish Vaswani;,citation_author=Noam Shazeer;,citation_author=Niki Parmar;,citation_author=Jakob Uszkoreit;,citation_author=Llion Jones;,citation_author=Aidan N Gomez;,citation_author=Łukasz Kaiser;,citation_author=Illia Polosukhin;,citation_publication_date=2017;,citation_cover_date=2017;,citation_year=2017;,citation_volume=30;,citation_journal_title=Advances in neural information processing systems;">
+<meta name="citation_reference" content="citation_title=Roformer: Enhanced transformer with rotary position embedding;,citation_author=Jianlin Su;,citation_author=Murtadha Ahmed;,citation_author=Yu Lu;,citation_author=Shengfeng Pan;,citation_author=Wen Bo;,citation_author=Yunfeng Liu;,citation_publication_date=2024;,citation_cover_date=2024;,citation_year=2024;,citation_volume=568;,citation_journal_title=Neurocomputing;,citation_publisher=Elsevier;">
+<meta name="citation_reference" content="citation_title=Xlnet: Generalized autoregressive pretraining for language understanding;,citation_author=Zhilin Yang;,citation_author=Zihang Dai;,citation_author=Yiming Yang;,citation_author=Jaime Carbonell;,citation_author=Russ R Salakhutdinov;,citation_author=Quoc V Le;,citation_publication_date=2019;,citation_cover_date=2019;,citation_year=2019;,citation_volume=32;,citation_journal_title=Advances in neural information processing systems;">
+<meta name="citation_reference" content="citation_title=Generalized autoregressive pretraining for language understanding. arXiv;,citation_author=Z Yang;,citation_author=Z Dai;,citation_author=Y Yang;,citation_author=J Carbonell;,citation_author=R Salakhutdinov;,citation_author=QV Le;,citation_publication_date=2019;,citation_cover_date=2019;,citation_year=2019;,citation_volume=19;,citation_journal_title=Preprint posted online June;">
+<meta name="citation_reference" content="citation_title=Scene text recognition with permuted autoregressive sequence models;,citation_author=Darwin Bautista;,citation_author=Rowel Atienza;,citation_publication_date=2022;,citation_cover_date=2022;,citation_year=2022;,citation_conference_title=European conference on computer vision;,citation_conference=Springer;">
+<meta name="citation_reference" content="citation_title=Turning whisper into real-time transcription system;,citation_author=Dominik Macháček;,citation_author=Raj Dabre;,citation_author=Ondřej Bojar;,citation_publication_date=2023;,citation_cover_date=2023;,citation_year=2023;,citation_conference_title=Proceedings of the 13th international joint conference on natural language processing and the 3rd conference of the asia-pacific chapter of the association for computational linguistics: System demonstrations;">
+<meta name="citation_reference" content="citation_title=Robust speech recognition via large-scale weak supervision;,citation_author=Alec Radford;,citation_author=Jong Wook Kim;,citation_author=Tao Xu;,citation_author=Greg Brockman;,citation_author=Christine McLeavey;,citation_author=Ilya Sutskever;,citation_publication_date=2023;,citation_cover_date=2023;,citation_year=2023;,citation_conference_title=International conference on machine learning;,citation_conference=PMLR;">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">ក្រង AI</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#abstract" id="toc-abstract" class="nav-link active" data-scroll-target="#abstract">Abstract</a></li>
+  <li><a href="#model-architecture" id="toc-model-architecture" class="nav-link" data-scroll-target="#model-architecture">Model Architecture</a>
+  <ul class="collapse">
+  <li><a href="#length-aware-rotary-position-embedding" id="toc-length-aware-rotary-position-embedding" class="nav-link" data-scroll-target="#length-aware-rotary-position-embedding">Length-Aware Rotary Position Embedding</a>
+  <ul class="collapse">
+  <li><a href="#length-predictor" id="toc-length-predictor" class="nav-link" data-scroll-target="#length-predictor">Length Predictor</a></li>
+  </ul></li>
+  <li><a href="#gated-attention-layers" id="toc-gated-attention-layers" class="nav-link" data-scroll-target="#gated-attention-layers">Gated Attention Layers</a></li>
+  <li><a href="#normalization-free-transformer" id="toc-normalization-free-transformer" class="nav-link" data-scroll-target="#normalization-free-transformer">Normalization-free Transformer</a></li>
+  <li><a href="#additional-models-capabilities" id="toc-additional-models-capabilities" class="nav-link" data-scroll-target="#additional-models-capabilities">Additional Model’s Capabilities</a>
+  <ul class="collapse">
+  <li><a href="#audio-with-arbitrary-length" id="toc-audio-with-arbitrary-length" class="nav-link" data-scroll-target="#audio-with-arbitrary-length">Audio with arbitrary length</a></li>
+  <li><a href="#voice-activity-detection" id="toc-voice-activity-detection" class="nav-link" data-scroll-target="#voice-activity-detection">Voice-Activity Detection</a></li>
+  <li><a href="#translation" id="toc-translation" class="nav-link" data-scroll-target="#translation">Translation</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#training" id="toc-training" class="nav-link" data-scroll-target="#training">Training</a></li>
+  <li><a href="#evaluation" id="toc-evaluation" class="nav-link" data-scroll-target="#evaluation">Evaluation</a>
+  <ul class="collapse">
+  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset">Dataset</a></li>
+  <li><a href="#metrics" id="toc-metrics" class="nav-link" data-scroll-target="#metrics">Metrics</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
+  </ul></li>
+  <li><a href="#downstream-tasks-and-limitations" id="toc-downstream-tasks-and-limitations" class="nav-link" data-scroll-target="#downstream-tasks-and-limitations">Downstream Tasks and Limitations</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">TrorYongASR2: Permuted Language Modeling with Monotonic Alignment, Gated Attention, and Normalization-free Design</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Science</div>
+    <div class="quarto-category">Automatic Speech Recognition</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Lightweight Permuted Language Modeling for Automatic Speech Recognition.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Kimang Khun <a href="mailto:kimang.khun@polytechnique.org" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> <a href="https://orcid.org/0000-0002-1939-4332" class="quarto-title-author-orcid" aria-label="ORCID profile for Kimang Khun"> <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">December 8, 2027</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="abstract" class="level1">
+<h1>Abstract</h1>
+<p>TrorYongASR1 is an Automatic Speech Recognition (ASR) model based on Permuted Language Modeling. Compared to Whisper, it has smaller number of parameters and performs equally nice for Khmer and English. In pursuit of performance and inference time improvement, I present <strong>TrorYongASR2</strong>, following the lines of TrorYongASR1, but with 4 key modifications: First, it uses Length-Aware Rotary Position Embedding (LARoPE) in the cross-attention layer of its auditory-lingual decoder to better align audio frames and text tokens. Furthermore, to better capture semantic information, the lowest frequencies in rotary position embeddings are removed. In addition, a gated mechanism is implemented in the decoder’s attention layers which allows text tokens to adjust the contribution from attention mechanism to the residual stream. Finally, to save computes, normalization-free design is incorporated in the auditory-lingual decoder. TrorYongASR2 is trained for <code>transcription</code> and <code>translation</code> tasks. It can also detect whether the audio contains speech or not, and identify the spoken language. The current version supports English and Khmer. Its <code>small</code> configuration achieves <code>WER</code> of 10.12% on test split of <code>librispeech_asr</code> (English transcription) and <code>WER</code> of 36.70% on Khmer test split of <code>google/fleurs</code> (Khmer transcription).</p>
+</section>
+<section id="model-architecture" class="level1">
+<h1>Model Architecture</h1>
+<p>TrorYongASR2, an update to TrorYongASR1 <span class="citation" data-cites="khun2026">(<a href="#ref-khun2026" role="doc-biblioref">Khun 2026</a>)</span>, augments the auditory-lingual decoder to 1) improve speech-text alignment, 2) enhance the expressivity of rotary position embedding, 3) ameliorate the expressivity of multi-head attention, and 4) speed up training and inference times. For speech-text alignment, Length-Aware RoPE (LARoPE) <span class="citation" data-cites="kim2026length">(<a href="#ref-kim2026length" role="doc-biblioref">Kim et al. 2026</a>)</span> is implemented in the cross-attention to enhance monotonic structure alignment. In addition, the lowest frequencies of RoPE in the context-position attention and LARoPE in speech-text alignment are removed to create robust semantic channels <span class="citation" data-cites="barbero2024round">(<a href="#ref-barbero2024round" role="doc-biblioref">Barbero et al. 2024</a>)</span>. To improve multi-head attention, a gating mechanism is integrated in the self-attention and the cross-attention layers of the auditory-lingual decoder: apply a head-specific sigmoid gate after the scaled dot-product attention. This introduces non-linearity upon the low-rank mapping in the softmax attention which mitigates ‘massive activation’ and ‘attention sink’ <span class="citation" data-cites="qiu2026gated">(<a href="#ref-qiu2026gated" role="doc-biblioref">Qiu et al. 2026</a>)</span>. Finally, the auditory-lingual decoder adopts point-wise dynamic rescaled Gaussian cumulative distribution function (Derf) <span class="citation" data-cites="chen2026stronger">(<a href="#ref-chen2026stronger" role="doc-biblioref">Chen et al. 2026</a>)</span> in place of normalization layers to save compute, hence accelerating training speed and inference process. <a href="#fig-archit" class="quarto-xref">Figure&nbsp;1</a> provides an overview of the TrorYongASR2 architecture.</p>
+<div id="fig-archit" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-archit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./figures/architecture6.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-archit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: TrorYongASR2 architecture. <em>Dropout</em> layers are omitted due to space constraints, \( [B] \), \( [L] \), \( [T] \), \( [E] \), and \( [P] \) are <em>begin-of-sequence</em>, <em>language</em>, <em>task</em>, <em>end-of-sequence</em>, and <em>pad</em> tokens respectively. This figure presents the case having 16 distinct target prediction positions. All projections in attention layers are explicitly shown here because specific to TrorYongASR2, a single position basis \( \) is used for each position to directly form query vectors (differently from the standard decoder of <span class="citation" data-cites="vaswani2017attention">(<a href="#ref-vaswani2017attention" role="doc-biblioref">Vaswani et al. 2017</a>)</span>, the linear layer for query projection is not required) while context vectors are the token embeddings multiplied by the position basis and are projected into key and value vectors. With the gated mechanism, masked multi-head attention (Masked MHA) generates gate score from context vector while MHA for speech-text alignment computes gate score from the hidden state, the output of Masked MHA. Inspired by QK-normalization, dynamic rescaled Gaussian cumulative distribution function (Derf), a drop-in replacement for normalization layers <span class="citation" data-cites="chen2026stronger">(<a href="#ref-chen2026stronger" role="doc-biblioref">Chen et al. 2026</a>)</span>, and p-RoPE<span class="citation" data-cites="barbero2024round">(<a href="#ref-barbero2024round" role="doc-biblioref">Barbero et al. 2024</a>)</span> are applied to the query and key vectors of Masked MHA right before computing the scaled dot-product attention. For the cross-attention layer, the query and key vectors are transformed by Derf and p-LARoPE. Attention masks are generated from randomly chosen permutations and are used only for the <em>context-position</em> attention. The last linear layer outputs logits over the vocabulary set. These logits are then used to compute cross-entropy loss. The audio encoder is simply Whisper’s Audio Encoder, but it can process audio of arbitrary length that is shorter than 30 seconds.
+</figcaption>
+</figure>
+</div>
+<section id="length-aware-rotary-position-embedding" class="level2">
+<h2 class="anchored" data-anchor-id="length-aware-rotary-position-embedding">Length-Aware Rotary Position Embedding</h2>
+<p>Length-Aware Rotary Position Embedding (LARoPE), a modification to RoPE, calculates relative distances between query and key vectors using length-normalized indices instead of absolute positional indices <span class="citation" data-cites="kim2026length">(<a href="#ref-kim2026length" role="doc-biblioref">Kim et al. 2026</a>)</span>. This extension induces diagonal bias in the attention score maps to better align the query vector from one source to the key vector from another source. LARoPE helps improve text-speech alignment in Text-To-Speech models <span class="citation" data-cites="kim2026length">(<a href="#ref-kim2026length" role="doc-biblioref">Kim et al. 2026</a>)</span>.</p>
+<p>With permuted sequence modeling design, speech-text alignment in the cross-attention layer is crucial to TrorYongASR. Leveraging LARoPE, TrorYongASR2 achieves significant performance improvement (see <a href="#fig-loss" class="quarto-xref">Figure&nbsp;3</a>). In addition, to enhance the expressivity of LARoPE as well as RoPE, the lowest frequency portion of the rotation are replaced by zero frequency (<em>i.e.,</em> no rotation). This is a hybrid NoPE-RoPE architecture proposed by <span class="citation" data-cites="barbero2024round">(<a href="#ref-barbero2024round" role="doc-biblioref">Barbero et al. 2024</a>)</span>. It enables channels without rotation to better carry semantic information.</p>
+<p>LARoPE requires the knowledge of audio length and text sequence length. As the text sequence length is unknown during inference, a length predictor module is designed to predict the sequence length given the audio.</p>
+<section id="length-predictor" class="level3">
+<h3 class="anchored" data-anchor-id="length-predictor">Length Predictor</h3>
+<p>To make TrorYongASR2 as lightweight as possible, length predictor infers the length of text sequence conditioned directly on the audio encoding. TrorYongASR2 limits the output text to <span class="math inline">\(448\)</span> tokens. Therefore, length predictor’s head is a linear layer with a softcap as the following:</p>
+<p><span class="math display">\[
+\mathrm{logits}\leftarrow 224 \times \mathrm{tanh} \left( \frac{\mathrm{logits}}{224} \right).
+\]</span> So, the output of length predictor stays between \( -224 \) and \( 224 \). Since the target output space is <span class="math inline">\(\{0, \dots, 448\}\)</span>, the length prediction is shifted by \( +224 \) and mean-squared-error loss can be used to train the length predictor. Note that no gradient should flow from this length loss to the audio encoder of TrorYongASR2 because the only role of audio encoder is to capture meaningful features of the input audio for the auditory-lingual decoder.</p>
+</section>
+</section>
+<section id="gated-attention-layers" class="level2">
+<h2 class="anchored" data-anchor-id="gated-attention-layers">Gated Attention Layers</h2>
+<p>Auditory-lingual decoder of TrorYongASR is just a single Transformer. So, the expressivity of the attention mechanisms in this block plays a vital role in improving the model performance. TrorYongASR2 augments the attention layers of this block with an input-dependent head-specific output gate. This gate allows the input to modulate the scaled dot-product attention and thus mitigate the ‘attention sink’ <span class="citation" data-cites="qiu2026gated">(<a href="#ref-qiu2026gated" role="doc-biblioref">Qiu et al. 2026</a>)</span>.</p>
+<p>Concretely, for hidden state <span class="math inline">\({\boldsymbol{h}}\)</span>, attention layers have additional parameter \( W^g \) such that the gate score for head \( i \) is given by <span class="math inline">\(\mathrm{Sigmoid}(W^g_i{\boldsymbol{h}})\)</span>. Let <span class="math inline">\(\mathrm{head}_i=\mathrm{Attention}({\boldsymbol{h}}, W^q_i, W^k_i, W^v_i)\)</span> be the scaled dot-product attention of head \( i \). The gated output of the multi-head attention is given by <span class="math display">\[
+{\boldsymbol{o}}=W^o\mathrm{Concat}\bigg[\mathrm{Sigmoid}(W^g_1{\boldsymbol{h}})\mathrm{head}_1, \dots, \mathrm{Sigmoid}(W^g_H{\boldsymbol{h}})\mathrm{head}_H\bigg]
+\]</span> where \( H \) is the number of heads in the attention layer. Hence, the hidden state <span class="math inline">\({\boldsymbol{h}}\)</span> can shut down or streamline the scaled dot-product attention from specific head into the residual stream. This makes the attention layers more expressive.</p>
+<p>With the custom design of TrorYongASR, the head-specific score in self-attention layer is derived from context vector, not the target token position embedding (see <a href="#fig-archit" class="quarto-xref">Figure&nbsp;1</a>). For cross-attention layer, the gate score is generated from the hidden state that derives the query vector for speech-text alignment.</p>
+</section>
+<section id="normalization-free-transformer" class="level2">
+<h2 class="anchored" data-anchor-id="normalization-free-transformer">Normalization-free Transformer</h2>
+<p>While normalization layers are crucial to the Transformer, they require a significant amount of compute compared to point-wise activation function. This induces longer training time and slower inference speed. <span class="citation" data-cites="chen2026stronger">(<a href="#ref-chen2026stronger" role="doc-biblioref">Chen et al. 2026</a>)</span> illustrates that dynamic rescaled Gaussian cumulative distribution function (abbreviated to Derf) can be used to replace normalization layers without hurting the performance. In fact, their analysis suggests performance gains compared to LayerNorm and RMSNorm across a wide range of domains, including visual recognition and generation, speech representation, and DNA sequence modeling. TrorYongASR2, thus, embraces this activation function in its auditory-lingual decoder and witnesses the gains in decoding performance and inference speed. However, TrorYongASR2 still maintains normalization layers over input representation (context vector, and audio encoding) and over the pre-logit hidden state (see <a href="#fig-archit" class="quarto-xref">Figure&nbsp;1</a>), as training otherwise became unstable.</p>
+</section>
+<section id="additional-models-capabilities" class="level2">
+<h2 class="anchored" data-anchor-id="additional-models-capabilities">Additional Model’s Capabilities</h2>
+<section id="audio-with-arbitrary-length" class="level3">
+<h3 class="anchored" data-anchor-id="audio-with-arbitrary-length">Audio with arbitrary length</h3>
+<p>TrorYongASR2 is trained with audio of arbitrary length. This aims at minimizing compute due to pad frames. Concretely, rather than padding each audio to 30-second length, audios are padded batch by batch to the longest length in the batch (the maximum length is still limited to 30-second long). <!-- and the attention mask is derived accordingly.
+
+In the audio encoder, the number of frames of log mel spectrogram is reduced by half by 1D convolutional layer.
+So, the attention mask is also down sampled by half using 1D max pooling layer with the same configuration of the 1D convolutional layer (_i.e.,_ the same kernel size, stride, etc.).
+This updated attention mask is used all the way from encoder transformers in audio encoder to the cross-attention layer of auditory-lingual decoder, as well as the length predictor module. --></p>
+<p>So, TrorYongASR2 works directly with audios of arbitrary length during inference and the inference speed becomes faster than the previous version.</p>
+</section>
+<section id="voice-activity-detection" class="level3">
+<h3 class="anchored" data-anchor-id="voice-activity-detection">Voice-Activity Detection</h3>
+<p>Another feature of speech-to-text model is to detect whether there is speech in the audio or not. A well-performed model in such detection task reduces its hallucination in both transcription and translation tasks. For this feature, <code>nonspeech7k</code> is used in training TrorYongASR2.</p>
+<p>TrorYongASR2 follows the multi-task training format of Whisper but without timestamps: For any audio, the token sequence starts with <em>begin-of-sequence</em> token and ends with <em>end-of-sequence</em> token. If the audio contains no speech, the first token is followed by <em>no-speech</em> token. Otherwise, the second and third tokens define the spoken language and the task respectively. Follow the third token are text tokens (see <a href="#fig-multi" class="quarto-xref">Figure&nbsp;2</a>).</p>
+<div id="fig-multi" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-multi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  classDef alert fill:#cb4b4f,stroke:#000,color:#fff;
+  classDef success fill:#009245,stroke:#000,color:#fff;
+  classDef warn fill:#FFEB3B,stroke:#000,color:#fff;
+
+  A[Begin of sequence]:::success --&gt; B[Language]
+  A[Begin of sequence]:::success --&gt; C[No speech]
+  A ~~~ C
+  B --&gt; D[Transcribe]
+  B --&gt; E[Translate]
+  D --&gt; F[Text]
+  E --&gt; F[Text]
+  C --&gt; G[End of sequence]:::alert
+  F --&gt; G[End of sequence]:::alert
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-multi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Multi-task training format of TrorYongASR2. The token sequence of any audio starts with \( [B] \), begin-of-sequence token. For audio without speech, \( [B] \) is followed by <code>nospeech</code> token and \( [E] \), end-of-sequence token. For other audios, the second token, \( [L] \), represents the language of speech (either <code>km</code> for Khmer or <code>en</code> for English). The third token is the task token \( [T] \) that conditions the distribution of the following text tokens: for English audio, <code>transcribe</code> token favors English text tokens, and <code>translate</code> token favors Khmer text tokens. For Khmer audio, it is the reverse.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="translation" class="level3">
+<h3 class="anchored" data-anchor-id="translation">Translation</h3>
+<p>TrorYongASR2 is trained with larger translation dataset. Concretely, there are around \( 142 \) hours of Khmer audio with English text and around \( 67 \) hours of English audio with Khmer text. This allows TrorYongASR2 to perform better for translation task.</p>
+<!-- 
+
+## Feature Scaling
+
+Query vector for position $i$, $q_i=\bp$ and key vector of token $j$, $k_j=W_k\bx_j$.
+Applying RoPE, we get $R_iq_i$ and $R_jW_k\bx_j$.
+Also, $\bp$ can be written as $P\bone$ where $P$ is a diagonal matrix with $P_{ii}=p_i$.
+The scaled dot-product is
+$$
+\begin{aligned}
+q_ik_j^\top
+&= R_i\bp\big( R_jW_k\bx_j\big)^\top \\
+&= (W_k\bx_j)^\top (R_j)^\top R_i\bp \\
+&= \bx_j^\top W_k^\top R_{-j}R_i\bp \\
+&= \bx_j^\top W_k^\top R_{i-j}\bp \\
+&= \bx_j^\top W_k^\top R_{i-j}P\bone
+\end{aligned}
+$$
+Note that $\bx_j$ is already pre-normalized.
+
+$P$ is stemmed from position basis.
+So, I decide to apply this transformation to any token representation to achieve symmetry between position query and token content.
+$$
+\begin{aligned}
+q_ik_j^\top
+&= R_i\bp\big( R_jW_k\bx_j'\big)^\top \\
+&= \bx_j'^\top W_k^\top R_{i-j}P\bone
+\end{aligned}
+$$
+where $\bx'_j$ is the pre-normalized of $P\bx_j$.
+-->
+</section>
+</section>
+</section>
+<section id="training" class="level1">
+<h1>Training</h1>
+<p>TrorYongASR2 is trained on 5 datasets:</p>
+<ul>
+<li>234 hours of <code>Digital-Divide-Data/khmer-speech-dataset</code> (the whole dataset contains 727.94 hours) for Khmer audio and Khmer text (transcription)</li>
+<li><code>train.360</code> split of <code>openslr/librispeech_asr</code> for English audio and English text (transcription)</li>
+<li><code>KrorngAI/DDD-Cambodia-khmer-speech-dataset-parquet-000-159-en-translate</code> for Khmer audio and English text (translation)</li>
+<li><code>KrorngAI/openslr-librispeech_asr-clean100-00000-19999-km-translate</code> for English audio and Khmer text (translation)</li>
+<li><code>nospeech7k</code> for no speech audio (voice activity detection)</li>
+</ul>
+<p>So, there are around 804 hours of audio in the training dataset.</p>
+<p>TrorYongASR2 has 2 configurations as the following</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 32%">
+<col style="width: 32%">
+<col style="width: 35%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;"><strong>Model Size</strong></th>
+<th style="text-align: center;">Tiny</th>
+<th style="text-align: center;">Small</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong>Audio Encoder</strong></td>
+<td style="text-align: center;">4 layers, 6 heads</td>
+<td style="text-align: center;">12 layers, 12 heads</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>Audio Context</strong></td>
+<td style="text-align: center;">1500</td>
+<td style="text-align: center;">1500</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>Auditory-lingual Decoder</strong></td>
+<td style="text-align: center;">1 layer, 12 heads</td>
+<td style="text-align: center;">1 layer, 24 heads</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>Text Context</strong></td>
+<td style="text-align: center;">448</td>
+<td style="text-align: center;">448</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>Embedding Dimension</strong></td>
+<td style="text-align: center;">384</td>
+<td style="text-align: center;">768</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>Parameters</strong></td>
+<td style="text-align: center;">29M</td>
+<td style="text-align: center;">136M</td>
+</tr>
+</tbody>
+</table>
+<p>The audio array is processed to log-mel spectrogram with 80 mel bins (the same as Whisper models of the same size). These configurations are the same as the ones of TrorYongASR1.</p>
+<p>To underline the gain from architectural improvement, TrorYongASR1 is retrained on the same 5 datasets above using the same set of hyperparameters used by TrorYongASR2. <a href="#fig-loss" class="quarto-xref">Figure&nbsp;3</a> shows the training history of <code>tiny</code> configuration. TrorYongASR2 has smaller training and validation losses, and higher validation token accuracy. This shows the effectiveness of the new architectural design in TrorYongASR2. The refinement also manifests in the evaluation below.</p>
+<div id="fig-loss" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-loss-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="./figures/train_val.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-loss-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Training history of TrorYongASR1 represented by the blue color and TrorYongASR2 represented by the red one. The first row shows the training loss and the second one describes validation performance. The top right plot shows the moving average of training loss. All plots suggest that TrorYongASR2 has better performance compared to TrorYongASR1.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="evaluation" class="level1">
+<h1>Evaluation</h1>
+<section id="dataset" class="level2">
+<h2 class="anchored" data-anchor-id="dataset">Dataset</h2>
+<p>The evaluation assesses transcription capability on two datasets: 1) <a href="https://huggingface.co/datasets/Kimang18/google-fleurs-km-kh"><code>google/fleurs</code></a> for Khmer and 2) <a href="https://huggingface.co/datasets/openslr/librispeech_asr"><code>openslr/librispeech_asr</code></a> for English. All results are from the <strong>test split</strong> of each dataset.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 22%">
+<col style="width: 11%">
+<col style="width: 17%">
+<col style="width: 49%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Dataset</th>
+<th>Language</th>
+<th>Testing samples</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>google/fleurs</strong></td>
+<td>Khmer</td>
+<td>765</td>
+<td>Multi-lingual dataset with Khmer language samples</td>
+</tr>
+<tr class="even">
+<td><strong>librispeech_asr.clean</strong></td>
+<td>English</td>
+<td>2611</td>
+<td>Clean speech dataset for English transcription</td>
+</tr>
+</tbody>
+</table>
+<p>Audio longer than 30 seconds are excluded from the evaluation (that is why <code>google/fleurs</code> has 765 samples instead of 771 and <code>librispeech_asr.clean</code> has 2611 instead of 2620).</p>
+</section>
+<section id="metrics" class="level2">
+<h2 class="anchored" data-anchor-id="metrics">Metrics</h2>
+<p>For transcription task, 3 metrics below are used</p>
+<ul>
+<li><strong>Token Error Rate (TER)</strong>: Proportion of incorrectly predicted tokens</li>
+<li><strong>Character Error Rate (CER)</strong>: Proportion of characters that are incorrect</li>
+<li><strong>Word Error Rate (WER)</strong>: Proportion of words that are incorrect</li>
+</ul>
+<p>TER measures model’s capability in predicting the next token given the audio input and the current sequence of tokens. This metric is weaker than WER and CER because it doesn’t account for insertions, deletions, substitutions, and autoregression as comprehensively.</p>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<table class="table-striped table-hover caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 11%">
+<col style="width: 26%">
+<col style="width: 45%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>Metric</th>
+<th>Khmer (<code>fleurs</code>)</th>
+<th>English (<code>librispeech.clean</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Tiny</strong></td>
+<td>WER</td>
+<td>57.07%</td>
+<td>20.35%</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>CER</td>
+<td>43.95%</td>
+<td>12.42%</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>TER</td>
+<td>49%</td>
+<td>11%</td>
+</tr>
+<tr class="even">
+<td><strong>Small</strong></td>
+<td>WER</td>
+<td>36.70%</td>
+<td>10.12%</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>CER</td>
+<td>29.26%</td>
+<td>6.05%</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>TER</td>
+<td>38%</td>
+<td>5%</td>
+</tr>
+</tbody>
+</table>
+<p>Both configurations performance well on English language. However, Khmer language remains a challenge.</p>
+<p><strong>Note:</strong> To compute <code>CER</code> and <code>WER</code>, whitespaces are added between words in Khmer text (Khmer text does not have word boundaries like English text). To do so, <code>khmercut</code> PyPI package is used to tokenize Khmer text into words, and then the words are joined back together with whitespaces. It is due to no-boundary Khmer words that Token Error Rate is utilized as one of the metrics.</p>
+<p><strong>Comparison with TrorYongASR1 and Whisper:</strong></p>
+<table class="table-striped table-hover caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 13%">
+<col style="width: 11%">
+<col style="width: 31%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Size</th>
+<th>Model</th>
+<th>Parameters</th>
+<th>Khmer (<code>fleurs</code>)</th>
+<th>English (<code>librispeech.clean</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Tiny</strong></td>
+<td>TrorYongASR2</td>
+<td>29M</td>
+<td><strong>57.07%</strong></td>
+<td>20.35%</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>TrorYongASR1</td>
+<td>29M</td>
+<td>75.88%</td>
+<td>54.33%</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>Whisper</td>
+<td>39M</td>
+<td>100.6%</td>
+<td><strong>7.6%</strong></td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>Small</strong></td>
+<td>TrorYongASR2</td>
+<td>136M</td>
+<td><strong>36.70%</strong></td>
+<td>10.12%</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>TrorYongASR1</td>
+<td>135M</td>
+<td>50.46%</td>
+<td>21.75%</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>Whisper</td>
+<td>244M</td>
+<td>104.4%</td>
+<td><strong>3.4%</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key Observations:</strong></p>
+<ul>
+<li>As mentioned above, TrorYongASR2 clearly outperforms TrorYongASR1 and requires just a small increase in the number of parameters (the increase comes from additional length predictor and gate projection layers)</li>
+<li>Whisper has most parameters for comparable configuration (39M vs 29M for <code>tiny</code>, and 244M vs 136M for <code>small</code>)</li>
+<li>Whisper shows significantly lower word error rates on English (7.6% for <code>tiny</code>, 3.4% for <code>small</code>)</li>
+<li>TrorYongASR2 performs best on Khmer dataset (57.07% for <code>tiny</code>, and 36.70% for <code>small</code>)</li>
+</ul>
+<p><strong>Note:</strong> <code>WER</code> data of Whisper is taken directly from their <a href="https://arxiv.org/abs/2212.04356">paper</a>.</p>
+<p><strong>Note on Translation Task:</strong> According to <a href="https://huggingface.co/KrorngAI">KrorngAI</a>, the 2 translation datasets above are built using the API of <a href="https://translatekh.mptc.gov.kh/">TranslateKH</a> which, in turn, uses an AI model for the translation (Khmer to English and vice-versa). Without any means to check the correctness of the translation over 209 hours of audio, TrorYongASR2 is not evaluated on any translation datasets. It can be assumed that the translation performance of TrorYongASR2 is upper bounded by the AI model used in the backend of <a href="https://translatekh.mptc.gov.kh/">TranslateKH</a>.</p>
+</section>
+</section>
+<section id="downstream-tasks-and-limitations" class="level1">
+<h1>Downstream Tasks and Limitations</h1>
+<p>TrorYongASR2 can be integrated into:</p>
+<ul>
+<li>IoT devices: Smart speakers, voice assistants</li>
+<li>Mobile application: Android/iOS apps with speech recognition</li>
+<li>Larger ASR systems: As a component in multi-language ASR pipelines</li>
+</ul>
+<p>However, TrorYongASR2 does not have built-in support for timestamps prediction. It might be possible to develop this feature around built-in voice-activity detection.</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-barbero2024round" class="csl-entry" role="listitem">
+Barbero, Federico, Alex Vitvitskyi, Christos Perivolaropoulos, Razvan Pascanu, and Petar Veličković. 2024. <span>“Round and Round We Go! What Makes Rotary Positional Encodings Useful?”</span> <em>arXiv Preprint arXiv:2410.06205</em>.
+</div>
+<div id="ref-chen2026stronger" class="csl-entry" role="listitem">
+Chen, Mingzhi, Taiming Lu, Jiachen Zhu, Mingjie Sun, and Zhuang Liu. 2026. <span>“Stronger Normalization-Free Transformers.”</span> In <em>Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition</em>, 27418–28.
+</div>
+<div id="ref-khun2026" class="csl-entry" role="listitem">
+Khun, Kimang. 2026. <span>“TrorYongASR: <span>Permuted</span> <span>AutoRegressive</span> <span>Sequence</span> <span>Modeling</span> for <span>Automatic</span> <span>Speech</span> <span>Recognition</span>.”</span> May 7, 2026. <a href="https://kimang18.github.io/krorngai-blog/TrorYongASR/">https://kimang18.github.io/krorngai-blog/TrorYongASR/</a>.
+</div>
+<div id="ref-kim2026length" class="csl-entry" role="listitem">
+Kim, Hyeongju, Juheon Lee, Jinhyeok Yang, and Jacob Morton. 2026. <span>“Length-Aware Rotary Position Embedding for Text-Speech Alignment.”</span> In <em>ICASSP 2026-2026 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)</em>, 18607–11. IEEE.
+</div>
+<div id="ref-qiu2026gated" class="csl-entry" role="listitem">
+Qiu, Zihan, Zekun Wang, Bo Zheng, Zeyu Huang, Kaiyue Wen, Songlin Yang, Rui Men, et al. 2026. <span>“Gated Attention for Large Language Models: Non-Linearity, Sparsity, and Attention-Sink-Free.”</span> <em>Advances in Neural Information Processing Systems</em> 38: 100092–118.
+</div>
+<div id="ref-vaswani2017attention" class="csl-entry" role="listitem">
+Vaswani, Ashish, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. 2017. <span>“Attention Is All You Need.”</span> <em>Advances in Neural Information Processing Systems</em> 30.
+</div>
+</div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{khun2027,
+  author = {Khun, Kimang},
+  title = {TrorYongASR2: {Permuted} {Language} {Modeling} with
+    {Monotonic} {Alignment,} {Gated} {Attention,} and
+    {Normalization-free} {Design}},
+  date = {2027-12-08},
+  url = {https://kimang18.github.io/krorngai-blog/TrorYongASR2/},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-khun2027" class="csl-entry quarto-appendix-citeas" role="listitem">
+Khun, Kimang. 2027. <span>“TrorYongASR2: Permuted Language Modeling with
+Monotonic Alignment, Gated Attention, and Normalization-Free
+Design.”</span> December 8, 2027. <a href="https://kimang18.github.io/krorngai-blog/TrorYongASR2/">https://kimang18.github.io/krorngai-blog/TrorYongASR2/</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
